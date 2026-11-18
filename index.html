@@ -1,1617 +1,287 @@
 <!DOCTYPE html>
-<html lang="ru">
-<head>
-<meta charset="utf-8">
+<html lang="ru"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>Tropic Merge — Merge & Build</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<title>Кафе «BotinoksCity»</title>
+<script type="text/javascript" src="https://me.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=XqP0-GkI4c0F9B_bvdMKlmLOWVjUkTL1hL0J8DuOSS68YaRAAuMZa7-N6CXcCQnTe539UebLsJqJ-J9V5hVOn6jTI5XWrkJj7RKzqZumSjqxlSXcaBNk69ynzjAWFfGDVGmeghytIBBlYaL9mZoCSbDECvLso_EuVj6BkHnug9VRmxT_07_Qv9FEpewzHoczguARmWXCZNrS9o0kbXPbLNqb7HDnwh65ZL-j7aLGgRAvXro-oDDrzB79a0PhCQP8jMIpqDpV5nyCOEMKN9pFxbU6J5B2TKN2qVRhdEWT6BGBzLXNWuc720VrJZ_qnxns" charset="UTF-8"></script><script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Neucha&display=swap" rel="stylesheet">
 <style>
-:root{
-  --ocean:#3cc4bd;
-  --ocean-deep:#269fa3;
-  --sand:#f7e8c8;
-  --sand-dark:#e6cf9f;
-  --grass:#7bd876;
-  --grass-dark:#58b959;
-  --card:#ffffff;
-  --ink:#263849;
-  --muted:#677b8c;
-  --gold:#ffb82e;
-  --coral:#ff6f61;
-  --energy:#29b6f6;
-  --shadow:0 4px 0 rgba(38,56,73,.14);
-}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;touch-action:manipulation}
-html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;background:var(--ocean)}
-body{
-  height:100dvh;
-  font-family:'Nunito',system-ui,-apple-system,sans-serif;
-  color:var(--ink);
-  display:flex;
-  flex-direction:column;
-  background:linear-gradient(180deg,#5ce1d6 0%,#3cc4bd 42%,#f5e6c4 43%,#ebd5a7 100%);
-}
-
-/* ===== TOP WIDGETS ===== */
-#hud{
-  padding:max(8px,env(safe-area-inset-top)) 10px 6px;
-  display:grid;
-  grid-template-columns:1.25fr 1fr 1fr auto;
-  gap:6px;
-  z-index:10;
-}
-.pill{
-  background:rgba(255,255,255,.94);
-  border-radius:14px;
-  padding:5px 9px;
-  box-shadow:var(--shadow);
-  display:flex;
-  align-items:center;
-  gap:6px;
-  min-width:0;
-}
-.pill-ic{font-size:18px;flex:none}
-.pill-col{display:flex;flex-direction:column;min-width:0;line-height:1.1}
-.pill-val{font-weight:900;font-size:14px;white-space:nowrap}
-.pill-sub{font-weight:700;font-size:10px;color:var(--muted);white-space:nowrap}
-.pill-btn{
-  background:#fff;
-  border:none;
-  border-radius:14px;
-  padding:0 10px;
-  font-size:18px;
-  box-shadow:var(--shadow);
-  cursor:pointer;
-}
-.pill-btn:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(38,56,73,.14)}
-
-/* ===== ISLAND DIORAMA (TOP SCENE) ===== */
-#island-wrap{
-  position:relative;
-  margin:0 10px;
-  height:31dvh;
-  min-height:185px;
-  max-height:260px;
-  border-radius:22px;
-  overflow:hidden;
-  background:radial-gradient(circle at 50% 35%,#79ece2 0%,#39c2bc 68%,#26a3a6 100%);
-  box-shadow:0 6px 16px rgba(24,78,84,.22),inset 0 2px 0 rgba(255,255,255,.45);
-  flex:none;
-}
-#island-svg{width:100%;height:100%;display:block}
-.stage-badge{
-  position:absolute;
-  top:6px;left:8px;
-  background:rgba(255,255,255,.88);
-  padding:2px 7px;
-  border-radius:9px;
-  font-size:10px;
-  font-weight:800;
-  box-shadow:0 2px 5px rgba(0,0,0,.1);
-  display:flex;align-items:center;gap:3px;
-  pointer-events:none;
-  z-index:2;
-}
-.build-cta{
-  position:absolute;
-  bottom:8px;right:10px;
-  z-index:3;
-  background:linear-gradient(180deg,#ffd24c,#ffad1f);
-  color:#3c2500;
-  border:2px solid #fff;
-  border-radius:14px;
-  padding:6px 12px;
-  font-family:inherit;
-  font-weight:900;
-  font-size:12px;
-  box-shadow:0 4px 10px rgba(0,0,0,.18);
-  cursor:pointer;
-  display:flex;align-items:center;gap:5px;
-}
-.build-cta.pulse{animation:pulseBtn 1.5s infinite}
-@keyframes pulseBtn{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
-
-/* SVG Island Animations */
-@keyframes wavePulse{0%,100%{transform:scale(1);opacity:.55}50%{transform:scale(1.035);opacity:.85}}
-@keyframes sway{0%,100%{transform:rotate(-2.5deg)}50%{transform:rotate(2.5deg)}}
-@keyframes spinSlow{to{transform:rotate(360deg)}}
-@keyframes floatBoat{0%,100%{transform:translateY(0px)}50%{transform:translateY(-3px)}}
-@keyframes smokeRise{0%{transform:translate(0,0) scale(.6);opacity:.7}100%{transform:translate(6px,-18px) scale(1.4);opacity:0}}
-@keyframes gullFly{0%{transform:translateX(-30px) translateY(0)}50%{transform:translateX(180px) translateY(-8px)}100%{transform:translateX(410px) translateY(2px)}}
-@keyframes popBuild{0%{transform:scale(0) translateY(15px);opacity:0}70%{transform:scale(1.12) translateY(-3px);opacity:1}100%{transform:scale(1) translateY(0);opacity:1}}
-.wave-ring{transform-origin:200px 115px;animation:wavePulse 3.6s ease-in-out infinite}
-.palm{transform-box:fill-box;transform-origin:bottom center;animation:sway 4s ease-in-out infinite}
-.mill-blades{transform-box:fill-box;transform-origin:center;animation:spinSlow 9s linear infinite}
-.boat-bob{animation:floatBoat 2.8s ease-in-out infinite}
-.smoke{animation:smokeRise 2.4s ease-out infinite}
-.gull{animation:gullFly 16s linear infinite}
-.bld-pop{transform-box:fill-box;transform-origin:bottom center;animation:popBuild .55s cubic-bezier(.22,1.25,.36,1) forwards}
-
-/* ===== ORDERS STRIP ===== */
-#orders{
-  display:flex;
-  gap:8px;
-  padding:6px 10px 4px;
-  overflow-x:auto;
-  flex:none;
-  scrollbar-width:none;
-}
-#orders::-webkit-scrollbar{display:none}
-.ord{
-  background:var(--card);
-  border-radius:16px;
-  padding:6px 10px;
-  box-shadow:var(--shadow);
-  display:flex;
-  align-items:center;
-  gap:8px;
-  flex:none;
-  border:2px solid transparent;
-  transition:.15s;
-}
-.ord.ready{border-color:#4cd964;background:#f2fff4}
-.ord-items{display:flex;gap:4px}
-.ord-it{
-  position:relative;
-  width:38px;height:38px;
-  border-radius:10px;
-  background:#f4efe4;
-  display:grid;place-items:center;
-}
-.ord-it.has{background:#dcfce7;box-shadow:inset 0 0 0 2px #4cd964}
-.ord-it .chk{
-  position:absolute;bottom:-3px;right:-3px;
-  background:#22c55e;color:#fff;
-  width:14px;height:14px;border-radius:50%;
-  font-size:9px;font-weight:900;display:grid;place-items:center;
-}
-.ord-go{
-  background:#22c55e;color:#fff;
-  border:none;border-radius:11px;
-  padding:6px 10px;
-  font-family:inherit;font-weight:900;font-size:12px;
-  cursor:pointer;
-  box-shadow:0 3px 0 #15803d;
-}
-.ord-go:disabled{background:#cbd5e1;box-shadow:none;color:#64748b;cursor:default}
-.ord-rew{font-size:11px;font-weight:800;color:var(--muted);line-height:1.15}
-
-/* ===== MERGE BOARD (5x6) ===== */
-#board-area{
-  flex:1;
-  padding:2px 10px 4px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  min-height:0;
-}
-#board{
-  display:grid;
-  grid-template-columns:repeat(6,1fr);
-  grid-template-rows:repeat(5,1fr);
-  gap:5px;
-  width:100%;
-  height:100%;
-  max-height:340px;
-  background:rgba(255,255,255,.38);
-  padding:6px;
-  border-radius:20px;
-  box-shadow:inset 0 2px 6px rgba(133,106,58,.18);
-}
-.cell{
-  position:relative;
-  border-radius:13px;
-  background:#fdf6e7;
-  box-shadow:0 2px 0 rgba(168,140,86,.35);
-  display:grid;
-  place-items:center;
-  transition:transform .12s,background .15s;
-}
-.cell.alt{background:#f5ebd4}
-.cell.sel{
-  background:#fff3bf;
-  box-shadow:0 0 0 3px var(--gold),0 4px 8px rgba(0,0,0,.15);
-  transform:scale(1.05);
-  z-index:3;
-}
-.cell.match{
-  box-shadow:0 0 0 2.5px #4cd964;
-  background:#ebffef;
-}
-.cell.locked{
-  background:#dfd3bc;
-  box-shadow:inset 0 2px 5px rgba(85,68,42,.25);
-}
-.cell.locked::after{
-  content:'';
-  position:absolute;inset:0;
-  border-radius:13px;
-  background:repeating-linear-gradient(45deg,rgba(255,255,255,.35) 0 4px,transparent 4px 9px);
-  pointer-events:none;
-}
-.cell.locked .item-svg{opacity:.58;filter:sepia(.35)}
-.lvl-dot{
-  position:absolute;
-  top:2px;left:4px;
-  font-size:9px;font-weight:900;
-  color:rgba(38,56,73,.55);
-  pointer-events:none;
-}
-.gen-ring{
-  position:absolute;
-  bottom:2px;right:3px;
-  font-size:10px;
-  background:var(--energy);
-  color:#fff;
-  border-radius:6px;
-  padding:0 3px;
-  font-weight:900;
-  pointer-events:none;
-}
-.need-dot{
-  position:absolute;
-  top:2px;right:3px;
-  width:8px;height:8px;
-  border-radius:50%;
-  background:#22c55e;
-  border:1.5px solid #fff;
-  pointer-events:none;
-}
-.item-svg{width:76%;height:76%;pointer-events:none;transition:transform .15s}
-.merge-anim{animation:mergePop .28s cubic-bezier(.2,1.4,.4,1)}
-@keyframes mergePop{0%{transform:scale(.4)}70%{transform:scale(1.18)}100%{transform:scale(1)}}
-
-/* ===== INFO BAR ABOVE NAV ===== */
-#sel-bar{
-  margin:0 10px 4px;
-  background:rgba(255,255,255,.92);
-  border-radius:14px;
-  padding:5px 10px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:8px;
-  min-height:36px;
-  font-size:12px;
-  box-shadow:0 2px 0 rgba(38,56,73,.1);
-}
-#sel-bar button{
-  border:none;border-radius:10px;
-  padding:4px 9px;
-  font-family:inherit;font-weight:800;font-size:11px;
-  cursor:pointer;
-}
-.btn-sell{background:#fee2e2;color:#b91c1c}
-.btn-bag{background:#e0f2fe;color:#0369a1}
-.btn-use{background:#dcfce7;color:#15803d}
-
-/* ===== BOTTOM CONTROL MENU ===== */
-#nav{
-  background:#ffffff;
-  padding:6px 10px max(8px,env(safe-area-inset-bottom));
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:6px;
-  border-radius:22px 22px 0 0;
-  box-shadow:0 -4px 16px rgba(38,56,73,.12);
-  z-index:10;
-}
-.nav-btn{
-  background:#f4f7f9;
-  border:none;
-  border-radius:14px;
-  padding:6px 4px;
-  display:flex;flex-direction:column;align-items:center;gap:2px;
-  font-family:inherit;font-weight:800;font-size:11px;color:var(--ink);
-  cursor:pointer;
-  position:relative;
-}
-.nav-btn *{pointer-events:none}
-.nav-btn span.ic{font-size:19px;line-height:1}
-.nav-btn.on{background:#dff7f4;color:#0f766e;box-shadow:inset 0 0 0 2px #3cc4bd}
-.badge{
-  position:absolute;top:3px;right:10px;
-  background:var(--coral);color:#fff;
-  font-size:9px;font-weight:900;
-  padding:1px 5px;border-radius:99px;
-}
-
-/* ===== DRAWER / MODAL ===== */
-#modal{
-  display:none;
-  position:fixed;inset:0;
-  background:rgba(22,38,52,.45);
-  backdrop-filter:blur(2px);
-  z-index:30;
-  align-items:flex-end;
-}
-#modal.on{display:flex}
-.sheet{
-  width:100%;
-  max-height:78dvh;
-  background:#fffdf8;
-  border-radius:26px 26px 0 0;
-  padding:14px 14px max(16px,env(safe-area-inset-bottom));
-  display:flex;flex-direction:column;gap:10px;
-  box-shadow:0 -8px 24px rgba(0,0,0,.2);
-  animation:slideUp .22s ease-out;
-}
-@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
-.sheet-head{display:flex;justify-content:space-between;align-items:center}
-.sheet-head h2{margin:0;font-size:19px}
-.back-btn{background:#f1f5f9;color:var(--ink);border:2px solid #e2e8f0;border-radius:12px;padding:6px 14px;font-family:inherit;font-size:13px;font-weight:800;line-height:1.1;box-shadow:0 2px 0 rgba(38,56,73,.12);cursor:pointer;flex:none}
-.back-btn:active{transform:translateY(2px);box-shadow:none}
-.sheet-body{overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-right:2px}
-.card-row{
-  background:#fff;
-  border:2px solid #efe6d5;
-  border-radius:16px;
-  padding:10px;
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
-}
-.card-row.done{background:#f3faf4;border-color:#bbf7d0}
-.act-btn{
-  background:linear-gradient(180deg,#4ade80,#22c55e);
-  color:#fff;border:none;border-radius:12px;
-  padding:8px 12px;font-family:inherit;font-weight:900;font-size:12px;
-  box-shadow:0 3px 0 #15803d;cursor:pointer;white-space:nowrap;
-}
-.act-btn:disabled{background:#cbd5e1;box-shadow:none;color:#64748b;cursor:default}
-
-/* Backpack & Atlas Grids */
-.bag-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.bag-slot{
-  aspect-ratio:1;border-radius:16px;
-  background:#f6efe0;border:2px dashed #d4c3a1;
-  display:grid;place-items:center;position:relative;cursor:pointer;
-}
-.bag-slot.filled{border-style:solid;background:#fff;border-color:#3cc4bd}
-.atlas-chain{background:#fff;border:2px solid #efe6d5;border-radius:16px;padding:8px}
-.atlas-items{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:6px}
-.atlas-cell{
-  aspect-ratio:1;border-radius:10px;background:#f7f2e7;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  font-size:9px;font-weight:800;text-align:center;padding:2px;
-}
-.atlas-cell.unk{opacity:.4}
-
-/* Floating feedback & drag ghost */
-#fl{position:fixed;inset:0;pointer-events:none;z-index:40}
-#fl div{
-  position:fixed;font-weight:900;font-size:16px;
-  pointer-events:none;animation:fltUp .85s forwards;
-  text-shadow:0 2px 0 #fff,0 -1px 0 #fff;z-index:40;
-}
-@keyframes fltUp{to{transform:translateY(-54px);opacity:0}}
-#ghost{
-  position:fixed;width:54px;height:54px;pointer-events:none;
-  z-index:50;transform:translate(-50%,-50%) scale(1.15);display:none;
-}
-
-/* ===== GUIDE TUTORIAL ===== */
-#tut-box{
-  display:none;
-  margin:2px 10px 4px;
-  background:linear-gradient(180deg,#fffef9,#fff6df);
-  border:2px solid #ffb82e;
-  border-radius:16px;
-  padding:7px 10px;
-  box-shadow:0 4px 12px rgba(38,56,73,.16);
-  align-items:center;
-  gap:9px;
-  z-index:25;
-  flex:none;
-}
-#tut-box.on{display:flex}
-.tut-ava{
-  width:38px;height:38px;border-radius:12px;
-  background:#dff7f4;border:1.5px solid #3cc4bd;
-  display:grid;place-items:center;flex:none;
-}
-.tut-mid{flex:1;min-width:0;line-height:1.25}
-.tut-top{display:flex;align-items:center;gap:6px;margin-bottom:2px}
-.tut-tag{font-size:10px;font-weight:900;color:#b45309;background:#fef3c7;padding:1px 6px;border-radius:6px}
-.tut-msg{font-size:12px;font-weight:700;color:var(--ink)}
-.tut-skip{
-  background:#f1f5f9;color:var(--muted);border:none;border-radius:10px;
-  padding:5px 8px;font-family:inherit;font-weight:800;font-size:11px;
-  cursor:pointer;flex:none;
-}
-.tut-pulse{
-  box-shadow:0 0 0 3px #ffb82e,0 0 14px rgba(255,184,46,.75) !important;
-  animation:tutGlow 1.15s ease-in-out infinite;
-  z-index:4;
-}
-@keyframes tutGlow{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
-body.tut-active .tut-dim{opacity:.42;pointer-events:none !important}
-</style>
-</head>
-<body>
-
-<!-- TOP WIDGETS -->
-<header id="hud">
-  <div class="pill">
-    <span class="pill-ic">⚡</span>
-    <div class="pill-col">
-      <span class="pill-val" id="h-en">50/50</span>
-      <span class="pill-sub" id="h-ent">Полная</span>
-    </div>
-  </div>
-  <div class="pill">
-    <span class="pill-ic">🪙</span>
-    <div class="pill-col">
-      <span class="pill-val" id="h-coin">0</span>
-      <span class="pill-sub">Монеты</span>
-    </div>
-  </div>
-  <div class="pill">
-    <span class="pill-ic">⭐</span>
-    <div class="pill-col">
-      <span class="pill-val" id="h-star">0</span>
-      <span class="pill-sub" id="h-stg">Этап 1/5</span>
-    </div>
-  </div>
-  <button class="pill-btn" id="btn-mute" title="Музыка">🔊</button>
-</header>
-
-<!-- ISLAND DIORAMA -->
-<section id="island-wrap">
-  <div class="stage-badge" id="stage-lbl">🏝 Песчаная отмель</div>
-  <svg id="island-svg" viewBox="48 24 304 162" preserveAspectRatio="xMidYMid slice"></svg>
-  <button class="build-cta" id="btn-build">🔨 Строить <span id="build-cnt"></span></button>
+:root{--paper:#e9f2e4;--ink:#2f3b52;--mint:#6cc5a1;--butter:#ffd978;--coral:#f2735f;--card:#fffaf0;--btn:#2f3b52}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none}
+body{height:100dvh;font:17px/1.3 Neucha,'Comic Sans MS',system-ui,sans-serif;color:var(--ink);background:var(--paper)}
+.scr{display:none;position:absolute;z-index:1;inset:0;padding:max(12px,env(safe-area-inset-top)) 14px max(12px,env(safe-area-inset-bottom));flex-direction:column;gap:10px;overflow-y:auto}
+.scr.on{display:flex}
+.box{background:var(--card);border:2.5px solid var(--ink);border-radius:18px 8px 16px 8px/8px 16px 8px 18px;box-shadow:3px 3px 0 var(--ink);padding:10px}
+button{font:inherit;color:var(--ink);background:var(--butter);border:2.5px solid var(--ink);border-radius:14px 6px 14px 6px;box-shadow:2px 3px 0 var(--ink);padding:10px 14px;cursor:pointer}
+button:active{transform:translate(2px,3px);box-shadow:none}
+button:disabled{opacity:.5}
+button.pri{background:var(--btn);color:#fff}
+h1{font-size:36px;margin:0;line-height:1}h2{margin:0;font-size:22px;line-height:1.1}p{margin:4px 0}
+.c{text-align:center}.row{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.hdr{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:2px 0 4px}
+.bk{padding:5px 12px;font-size:15px;line-height:1.1;border-radius:12px 6px 12px 6px;box-shadow:2px 2px 0 var(--ink);margin-left:auto;flex:none}
+.bar{height:12px;border:2px solid var(--ink);border-radius:8px;background:#fff;overflow:hidden}
+.bar i{display:block;height:100%;width:100%;background:var(--mint)}.bar.p i{background:var(--coral)}
+#top{display:flex;justify-content:space-between;align-items:center;border-radius:12px;padding:4px 8px}
+.fev #top{background:var(--coral);color:#fff}
+#cust{display:flex;gap:10px;align-items:center}#cust .em{font-size:46px}
+.plate{display:flex;gap:8px;justify-content:center}
+.slot{width:56px;height:56px;border:2.5px dashed var(--ink);border-radius:50%;display:grid;place-items:center;font-size:30px;background:#fff}
+.slot.f{border-style:solid;background:var(--butter)}
+#tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.tab{padding:5px 2px;font-size:13px}.tab b{display:block;font-size:24px;font-weight:400}
+.tab.on{background:var(--mint)}.tab.dot::after{content:' ●';color:var(--coral)}
+#grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;flex:1;min-height:150px}
+.ing{font-size:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px}
+.ing b{font-size:34px;font-weight:400}.ing.on{background:var(--mint)}.ing.hint{outline:3px dashed var(--coral)}
+#acts{display:grid;grid-template-columns:1fr 2fr 1fr;gap:8px}
+.shk{animation:shk .3s}@keyframes shk{25%{transform:translate(-6px,2px)}75%{transform:translate(6px,-2px)}}
+#fl div{position:fixed;font-size:22px;pointer-events:none;animation:up .9s forwards;text-shadow:0 2px #fff;z-index:9}
+@keyframes up{to{transform:translateY(-70px);opacity:0}}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:8}
+#dlg{justify-content:flex-end}#dav{font-size:96px;text-align:center}
+.up{display:grid;gap:4px}.pip{letter-spacing:3px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+#bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;--wo:.1}
+#bg::before{content:'';position:absolute;top:7%;right:12%;width:110px;height:110px;border-radius:50%;background:radial-gradient(#fffc,transparent 70%)}
+#bg::after{content:'';position:absolute;inset:0;background:radial-gradient(rgba(47,59,82,.06) 1.5px,transparent 1.6px) 0 0/18px 18px}
+#bg svg{position:absolute;left:0;bottom:0;width:100%;height:42%;filter:blur(1.2px)}#bg .w{fill:#ffd978;opacity:var(--wo)}
+#ev{font-size:14px;min-height:0}#dnm{font-size:20px}svg.av{overflow:hidden;flex:none}
+</style></head><body><div id="bg"></div>
+<section id="menu" class="scr on">
+ <div class="c" style="margin-top:6vh"><div style="font-size:56px">🏦☕</div><h1>Кафе «BotinoksCity»</h1><p>42-й этаж. Тепло, которое не оцифровать.</p></div>
+ <div class="box c"><p id="hello"></p><p id="stat"></p><p id="dq"></p><p id="dec"></p></div>
+ <button class="pri" id="bPlay"></button><button id="bKit">🛠 Кухня и улучшения</button><button id="bBook">📖 Книга рецептов</button><button id="bDiary">📅 Дневник: задание и награды</button><button id="bMute">🔊 Звук: вкл</button>
 </section>
-
-<!-- ORDERS STRIP -->
-<section id="orders"></section>
-
-<!-- GUIDE VILLAGER TUTORIAL -->
-<section id="tut-box">
-  <div class="tut-ava">
-    <svg width="28" height="32" viewBox="-12 -20 24 26">
-      <ellipse cx="0" cy="3" rx="6" ry="2.2" fill="rgba(0,0,0,.15)"/>
-      <rect x="-4.5" y="-9" width="9" height="12" rx="4.2" fill="#ff7043"/>
-      <circle cx="0" cy="-14" r="4.6" fill="#ffe0b2"/>
-    </svg>
-  </div>
-  <div class="tut-mid">
-    <div class="tut-top"><span class="tut-tag" id="tut-step">Обучение 1/5</span><b style="font-size:11px;color:#0f766e">Островитянин</b></div>
-    <div class="tut-msg" id="tut-msg">Нажми на Лесную рощу ⚡, чтобы добыть ресурс!</div>
-  </div>
-  <button class="tut-skip" id="tut-skip">Пропустить</button>
+<section id="dlg" class="scr"><div id="dav"></div><div class="box"><b id="dnm"></b><p id="dtx" style="font-size:19px;min-height:90px"></p><p class="c" style="opacity:.6">нажми, чтобы продолжить</p></div></section>
+<section id="game" class="scr" style="gap:8px">
+ <div id="top" class="box"><span id="sc">0</span><span id="cb"></span><span id="tm"></span></div>
+ <div class="bar"><i id="tb"></i></div><div id="ev" class="c"></div>
+ <div id="cust" class="box"><div class="em" id="ce"></div><div style="flex:1"><b id="cn"></b><p id="ct"></p><div class="bar p"><i id="pb"></i></div></div></div>
+ <div class="plate" id="plate"></div>
+ <div id="tabs"></div><div id="grid"></div>
+ <div id="acts"><button id="bClr">🗑</button><button class="pri" id="bServe">Подать</button><button id="bBk">📖</button></div>
 </section>
-
-<!-- MERGE BOARD -->
-<main id="board-area">
-  <div id="board"></div>
-</main>
-
-<!-- SELECTED ITEM ACTION BAR -->
-<div id="sel-bar">
-  <span id="sel-txt" style="color:var(--muted);font-weight:700">Нажми на рощу ⚡ или перетащи 2 одинаковых предмета</span>
-  <div id="sel-acts" style="display:flex;gap:5px"></div>
-</div>
-
-<!-- BOTTOM CONTROL MENU -->
-<nav id="nav">
-  <button class="nav-btn on" data-tab="board"><span class="ic">🧩</span>Поле</button>
-  <button class="nav-btn" data-tab="build"><span class="ic">🏗</span>Стройка<span class="badge" id="bdg-build" style="display:none">!</span></button>
-  <button class="nav-btn" data-tab="bag"><span class="ic">🎒</span>Склад<span class="badge" id="bdg-bag">0/4</span></button>
-  <button class="nav-btn" data-tab="atlas"><span class="ic">📖</span>Атлас</button>
-</nav>
-
-<!-- MODAL SHEET -->
-<div id="modal">
-  <div class="sheet">
-    <div class="sheet-head">
-      <h2 id="m-title">Заголовок</h2>
-      <button class="back-btn" id="m-close">Назад</button>
-    </div>
-    <div class="sheet-body" id="m-body"></div>
-  </div>
-</div>
-
-<div id="ghost"></div>
-<div id="fl"></div>
+<section id="kit" class="scr"><div class="hdr"><h2>Кухня и улучшения</h2><button class="bk" id="kBack">Назад</button></div><div class="box">Монеты: <b id="coins"></b> 🪙</div><div id="ups" class="up"></div><h2>Украшения</h2><div id="decl" class="up"></div></section>
+<section id="book" class="scr"><div class="hdr"><h2>Книга рецептов</h2><button class="bk" id="bkBack">Назад</button></div><div id="bl" class="up"></div></section>
+<section id="diary" class="scr"><div class="hdr"><h2>Дневник</h2><button class="bk" id="dyBack">Назад</button></div><div id="dyl" class="up"></div></section>
+<section id="res" class="scr"><h2 class="c" id="rt"></h2><div class="box" id="rb"></div><button class="pri" id="rOk">Продолжить</button></section>
+<canvas id="fx"></canvas><div id="fl"></div>
 <audio id="bgm" src="music.mp3" loop preload="auto"></audio>
-
 <script>
 'use strict';
-const tg = window.Telegram && Telegram.WebApp;
-const $ = s => document.querySelector(s);
-if (tg) {
-  try {
-    tg.ready(); tg.expand();
-    tg.setHeaderColor('#5ce1d6');
-    tg.setBackgroundColor('#ebd5a7');
-  } catch (e) {}
-}
-const hap = t => { try { tg.HapticFeedback.impactOccurred(t || 'light'); } catch (e) {} };
-const note = t => { try { tg.HapticFeedback.notificationOccurred(t); } catch (e) {} };
-
-/* ===== STORAGE ===== */
-const SAVE_KEY = 'sun_island_v1';
-const store = {
-  get: k => new Promise(r => {
-    const loc = () => { try { return localStorage.getItem(k); } catch (e) { return null; } };
-    let done = false;
-    const finish = val => { if (!done) { done = true; r(val); } };
-    setTimeout(() => finish(loc()), 500);
-    try {
-      if (tg && tg.CloudStorage && tg.isVersionAtLeast('6.9')) {
-        tg.CloudStorage.getItem(k, (e, v) => finish(!e && v ? v : loc()));
-        return;
-      }
-    } catch (e) {}
-    finish(loc());
-  }),
-  set(k, v) {
-    try { localStorage.setItem(k, v); } catch (e) {}
-    try { if (tg && tg.CloudStorage && tg.isVersionAtLeast('6.9')) tg.CloudStorage.setItem(k, v); } catch (e) {}
-  }
-};
-
-/* ===== AUDIO (Custom music.mp3 + Cozy Procedural Kalimba Fallback) ===== */
-const bgm = $('#bgm');
-let bgmReady = true, customBlobUrl = null, AC = null, musicTimer = null, noteStep = 0;
-bgm.onerror = () => { bgmReady = false; };
-
-function tone(freq, dur, type, vol, delay) {
-  if (S.mute) return;
-  try {
-    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
-    if (AC.state === 'suspended') AC.resume();
-    const o = AC.createOscillator(), g = AC.createGain(), t = AC.currentTime + (delay || 0);
-    o.type = type || 'sine';
-    o.frequency.value = freq;
-    g.gain.setValueAtTime(vol || 0.1, t);
-    g.gain.exponentialRampToValueAtTime(0.0008, t + (dur || 0.14));
-    o.connect(g); g.connect(AC.destination);
-    o.start(t); o.stop(t + (dur || 0.14));
-  } catch (e) {}
-}
-const sfxTap = () => tone(520, 0.06, 'sine', 0.08);
-const sSpawn = () => { tone(440, 0.07, 'triangle', 0.09); tone(660, 0.09, 'triangle', 0.08, 0.04); };
-const sMerge = lvl => {
-  const base = 392 * Math.pow(1.08, lvl);
-  tone(base, 0.12, 'triangle', 0.12);
-  tone(base * 1.25, 0.16, 'triangle', 0.11, 0.06);
-};
-const sOrder = () => [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(f, 0.18, 'triangle', 0.11, i * 0.07));
-const sBuild = () => [392, 493.88, 587.33, 783.99, 987.77].forEach((f, i) => tone(f, 0.24, 'sine', 0.13, i * 0.08));
-
-function startProceduralMusic() {
-  clearTimeout(musicTimer);
-  if (S.mute || (bgmReady && !bgm.paused)) return;
-  const scale = [523.25, 587.33, 659.25, 783.99, 880, 1046.5];
-  const bass = [130.81, 174.61, 196.00, 164.81];
-  if (noteStep % 4 === 0) tone(bass[(noteStep >> 2) % 4], 0.55, 'sine', 0.045);
-  if (Math.random() < 0.65) {
-    const f = scale[(noteStep * 3 + (Math.random() * 3 | 0)) % scale.length];
-    tone(f, 0.28, 'sine', 0.032);
-  }
-  noteStep++;
-  musicTimer = setTimeout(startProceduralMusic, 420);
-}
-
-function syncAudio() {
-  bgm.volume = 0.4;
-  $('#btn-mute').textContent = S.mute ? '🔇' : '🔊';
-  if (S.mute) {
-    bgm.pause();
-    clearTimeout(musicTimer);
-    return;
-  }
-  if (bgmReady) {
-    bgm.play().then(() => clearTimeout(musicTimer)).catch(() => startProceduralMusic());
-  } else {
-    startProceduralMusic();
-  }
-}
-document.addEventListener('click', () => { if (!S.mute && bgm.paused) syncAudio(); }, { passive: true });
-
-/* ===== GAME DATA: CHAINS, ITEMS, BUILDINGS, STAGES ===== */
-const CHAINS = {
-  wood: {
-    name: 'Дерево',
-    items: ['Ветка', 'Бревно', 'Доски', 'Брус', 'Сруб', 'Резной фасад', 'Башня']
-  },
-  stone: {
-    name: 'Камень и Руда',
-    items: ['Галька', 'Булыжник', 'Блок', 'Кирпичи', 'Руда', 'Слиток', 'Механизм']
-  },
-  food: {
-    name: 'Урожай и Еда',
-    items: ['Росток', 'Колос', 'Сноп', 'Мука', 'Тесто', 'Хлеб', 'Пир']
-  },
-  tool: {
-    name: 'Ремесло',
-    items: ['Кремень', 'Топор', 'Пила', 'Молоток', 'Наковальня', 'Компас']
-  },
-  coin: {
-    name: 'Сокровища',
-    items: ['Медяк', 'Серебро', 'Золото', 'Сундук']
-  }
-};
-
-const GENS = {
-  g_wood: { name: 'Лесная роща', chain: 'wood', sub: 'tool', subChance: 0.18 },
-  g_stone: { name: 'Каменный карьер', chain: 'stone', sub: 'tool', subChance: 0.20 },
-  g_food: { name: 'Плодородная грядка', chain: 'food', sub: 'coin', subChance: 0.12 }
-};
-
-function itemSVG(key, lvl) {
-  const s = '<svg class="item-svg" viewBox="0 0 64 64">';
-  if (key === 'g_wood') return s + '<ellipse cx="32" cy="52" rx="22" ry="7" fill="#58b959"/><circle cx="24" cy="30" r="14" fill="#43a047"/><circle cx="40" cy="32" r="12" fill="#66bb6a"/><circle cx="32" cy="21" r="13" fill="#81c784"/><rect x="29" y="38" width="6" height="14" rx="2" fill="#795548"/></svg>';
-  if (key === 'g_stone') return s + '<ellipse cx="32" cy="53" rx="23" ry="6" fill="#90a4ae"/><polygon points="12,50 22,22 36,18 52,50" fill="#78909c"/><polygon points="24,50 35,24 49,50" fill="#90a4ae"/><polygon points="28,28 34,22 39,29" fill="#eceff1"/></svg>';
-  if (key === 'g_food') return s + '<rect x="10" y="34" width="44" height="18" rx="6" fill="#8d6e63"/><rect x="14" y="37" width="36" height="10" rx="4" fill="#5d4037"/><path d="M22 37c0-10-6-14-6-14s8 0 8 10M32 37c0-13 0-18 0-18s6 4 2 14M42 37c0-10 6-14 6-14s-8 0-8 10" stroke="#7cb342" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg>';
-
-  if (key === 'wood') {
-    const shapes = [
-      '<path d="M16 46L48 18M34 30L44 34M26 38L22 28" stroke="#8d6e63" stroke-width="6" stroke-linecap="round"/>',
-      '<rect x="14" y="24" width="36" height="16" rx="7" fill="#8d6e63"/><circle cx="46" cy="32" r="7" fill="#d7ccc8"/>',
-      '<rect x="12" y="20" width="40" height="9" rx="3" fill="#bcaaa4"/><rect x="14" y="33" width="38" height="9" rx="3" fill="#a1887f"/>',
-      '<path d="M14 42h36v8H14zM18 32h28v8H18zM24 22h16v8H24z" fill="#8d6e63" stroke="#5d4037" stroke-width="2"/>',
-      '<rect x="16" y="26" width="32" height="24" rx="3" fill="#a1887f"/><polygon points="12,28 32,12 52,28" fill="#ff7043"/><rect x="28" y="36" width="8" height="14" fill="#5d4037"/>',
-      '<rect x="14" y="22" width="36" height="28" rx="4" fill="#ffe0b2" stroke="#8d6e63" stroke-width="3"/><polygon points="10,24 32,9 54,24" fill="#ef5350"/><circle cx="32" cy="18" r="3" fill="#ffd54f"/>',
-      '<rect x="20" y="18" width="24" height="34" rx="3" fill="#d7ccc8" stroke="#6d4c41" stroke-width="2.5"/><polygon points="16,20 32,6 48,20" fill="#ffb300"/><rect x="28" y="26" width="8" height="10" rx="4" fill="#29b6f6"/>'
-    ];
-    return s + (shapes[lvl] || shapes[0]) + '</svg>';
-  }
-  if (key === 'stone') {
-    const shapes = [
-      '<ellipse cx="32" cy="36" rx="14" ry="10" fill="#b0bec5"/>',
-      '<polygon points="16,44 20,24 38,20 48,34 42,46" fill="#90a4ae"/>',
-      '<rect x="16" y="20" width="32" height="26" rx="5" fill="#78909c"/><path d="M16 32h32M32 20v26" stroke="#cfd8dc" stroke-width="2"/>',
-      '<rect x="12" y="34" width="18" height="10" rx="2" fill="#e57373"/><rect x="34" y="34" width="18" height="10" rx="2" fill="#ef5350"/><rect x="22" y="22" width="20" height="10" rx="2" fill="#ff8a65"/>',
-      '<polygon points="16,46 24,18 42,20 48,46" fill="#546e7a"/><circle cx="29" cy="31" r="4" fill="#ffd54f"/><circle cx="38" cy="37" r="3" fill="#4fc3f7"/>',
-      '<polygon points="14,42 22,24 44,24 50,42" fill="#cfd8dc" stroke="#78909c" stroke-width="2"/><polygon points="22,24 44,24 40,31 25,31" fill="#fff"/>',
-      '<circle cx="32" cy="32" r="15" fill="none" stroke="#ffb300" stroke-width="7" stroke-dasharray="7 4"/><circle cx="32" cy="32" r="7" fill="#546e7a"/>'
-    ];
-    return s + (shapes[lvl] || shapes[0]) + '</svg>';
-  }
-  if (key === 'food') {
-    const shapes = [
-      '<path d="M32 48V28M32 34c-8-6-12-2-12-2s4 6 12 2M32 30c8-6 12-2 12-2s-4 6-12 2" stroke="#66bb6a" stroke-width="4" fill="none" stroke-linecap="round"/>',
-      '<path d="M26 48L38 16" stroke="#fbc02d" stroke-width="4" stroke-linecap="round"/><ellipse cx="34" cy="24" rx="4" ry="7" fill="#fdd835"/><ellipse cx="30" cy="33" rx="4" ry="7" fill="#fbc02d"/>',
-      '<rect x="20" y="18" width="24" height="30" rx="10" fill="#fdd835"/><rect x="18" y="31" width="28" height="5" rx="2" fill="#e65100"/>',
-      '<path d="M18 22h28l4 26H14z" fill="#fff8e1" stroke="#d7ccc8" stroke-width="2"/><circle cx="32" cy="36" r="6" fill="#ffe082"/>',
-      '<ellipse cx="32" cy="36" rx="17" ry="12" fill="#ffe0b2" stroke="#ffb74d" stroke-width="2"/>',
-      '<ellipse cx="32" cy="35" rx="19" ry="13" fill="#d9822b"/><path d="M23 28l4 8M31 27l4 8M39 29l3 7" stroke="#ffe0b2" stroke-width="2.5" stroke-linecap="round"/>',
-      '<ellipse cx="32" cy="44" rx="22" ry="7" fill="#eceff1"/><ellipse cx="32" cy="35" rx="15" ry="10" fill="#ff7043"/><circle cx="24" cy="38" r="4" fill="#66bb6a"/><circle cx="40" cy="38" r="4" fill="#ffd54f"/>'
-    ];
-    return s + (shapes[lvl] || shapes[0]) + '</svg>';
-  }
-  if (key === 'tool') {
-    const shapes = [
-      '<polygon points="22,44 30,18 44,38" fill="#78909c"/>',
-      '<rect x="30" y="16" width="5" height="34" rx="2" fill="#8d6e63"/><polygon points="20,18 36,16 36,28 20,25" fill="#90a4ae"/>',
-      '<polygon points="14,38 46,20 50,27 18,45" fill="#b0bec5"/><rect x="12" y="36" width="10" height="12" rx="3" fill="#ff7043"/>',
-      '<rect x="30" y="22" width="5" height="28" rx="2" fill="#8d6e63"/><rect x="18" y="16" width="28" height="11" rx="3" fill="#546e7a"/>',
-      '<path d="M14 26h36l-6 10h6v10H14V36h6z" fill="#455a64"/>',
-      '<circle cx="32" cy="32" r="18" fill="#ffd54f" stroke="#f57f17" stroke-width="3"/><circle cx="32" cy="32" r="12" fill="#fff"/><polygon points="32,21 36,32 32,43 28,32" fill="#ef5350"/>'
-    ];
-    return s + (shapes[lvl] || shapes[0]) + '</svg>';
-  }
-  const shapes = [
-    '<circle cx="32" cy="32" r="13" fill="#d97706" stroke="#92400e" stroke-width="2.5"/>',
-    '<circle cx="32" cy="32" r="15" fill="#e2e8f0" stroke="#64748b" stroke-width="2.5"/><circle cx="32" cy="32" r="9" fill="none" stroke="#94a3b8" stroke-width="2"/>',
-    '<circle cx="32" cy="32" r="17" fill="#fbbf24" stroke="#d97706" stroke-width="3"/><text x="32" y="38" text-anchor="middle" font-size="18" font-weight="900" fill="#92400e">★</text>',
-    '<rect x="14" y="24" width="36" height="24" rx="5" fill="#b45309" stroke="#78350f" stroke-width="2.5"/><path d="M14 31h36" stroke="#fbbf24" stroke-width="4"/><rect x="28" y="28" width="8" height="9" rx="2" fill="#fde047"/>'
-  ];
-  return s + (shapes[lvl] || shapes[0]) + '</svg>';
-}
-
-const STAGES = [
-  { name: 'Песчаная отмель', blds: ['fire', 'tent', 'bridge'] },
-  { name: 'Бухта рыбака', blds: ['pier', 'hut', 'boat'] },
-  { name: 'Каменный утёс', blds: ['quarry_b', 'forge', 'lighthouse'] },
-  { name: 'Ветреное плато', blds: ['field', 'mill', 'bakery'] },
-  { name: 'Солнечный порт', blds: ['workshop', 'market', 'hall'] }
-];
-
-const BUILDINGS = [
-  { id: 'fire', st: 0, name: 'Костёр путешественника', desc: '+1 житель на острове', stars: 2, coins: 25, x: 165, y: 128 },
-  { id: 'tent', st: 0, name: 'Уютный шалаш', desc: 'Макс. энергия +3 ⚡', stars: 3, coins: 45, x: 125, y: 112, enCap: 3 },
-  { id: 'bridge', st: 0, name: 'Деревянный мостик', desc: 'Открывает Бухту рыбака', stars: 4, coins: 75, x: 225, y: 132 },
-
-  { id: 'pier', st: 1, name: 'Рыбацкий причал', desc: '+1 житель и лодка у берега', stars: 5, coins: 110, x: 280, y: 148 },
-  { id: 'hut', st: 1, name: 'Хижина у воды', desc: 'Макс. энергия +3 ⚡', stars: 6, coins: 150, x: 252, y: 116, enCap: 3 },
-  { id: 'boat', st: 1, name: 'Парусный баркас', desc: 'Открывает Каменный утёс', stars: 8, coins: 210, x: 325, y: 158 },
-
-  { id: 'quarry_b', st: 2, name: 'Склад камня', desc: 'Дарит Каменный карьер на поле!', stars: 9, coins: 260, x: 145, y: 82, grantGen: 'g_stone' },
-  { id: 'forge', st: 2, name: 'Дымная кузница', desc: '+1 житель-кузнец', stars: 11, coins: 330, x: 188, y: 76 },
-  { id: 'lighthouse', st: 2, name: 'Белый маяк', desc: 'Открывает Ветреное плато', stars: 14, coins: 420, x: 92, y: 88 },
-
-  { id: 'field', st: 3, name: 'Золотые грядки', desc: 'Дарит Плодородную грядку!', stars: 15, coins: 480, x: 238, y: 84, grantGen: 'g_food' },
-  { id: 'mill', st: 3, name: 'Ветряная мельница', desc: 'Макс. энергия +4 ⚡', stars: 18, coins: 580, x: 285, y: 86, enCap: 4 },
-  { id: 'bakery', st: 3, name: 'Тёплая пекарня', desc: 'Открывает Солнечный порт', stars: 22, coins: 700, x: 212, y: 102 },
-
-  { id: 'workshop', st: 4, name: 'Мастерская изобретателя', desc: '+1 житель-мастер', stars: 25, coins: 850, x: 162, y: 102 },
-  { id: 'market', st: 4, name: 'Торговый ряд', desc: '+15% монет за заказы', stars: 30, coins: 1050, x: 268, y: 132 },
-  { id: 'hall', st: 4, name: 'Солнечная ратуша', desc: 'Макс. энергия +5 ⚡ и финал главы!', stars: 36, coins: 1350, x: 200, y: 64, enCap: 5 }
-];
-
-/* ===== STATE ===== */
-let S = {
-  en: 50,
-  enTs: Date.now(),
-  coins: 60,
-  stars: 0,
-  stage: 0,
-  built: {},
-  genLvl: { g_wood: 1, g_stone: 1, g_food: 1 },
-  board: [],
-  bag: [],
-  orders: [],
-  seen: { wood: [1, 0, 0, 0, 0, 0, 0], stone: [0, 0, 0, 0, 0, 0, 0], food: [0, 0, 0, 0, 0, 0, 0], tool: [0, 0, 0, 0, 0, 0], coin: [0, 0, 0, 0] },
-  mute: 0,
-  lastPop: '',
-  tut: 0
-};
-const save = () => store.set(SAVE_KEY, JSON.stringify(S));
-
-function maxEn() {
-  let m = 50;
-  BUILDINGS.forEach(b => { if (S.built[b.id] && b.enCap) m += b.enCap; });
-  return m;
-}
-
-function regenEnergy() {
-  const cap = maxEn();
-  const now = Date.now();
-  if (S.en >= cap) { S.enTs = now; return; }
-  const stepMs = 30000;
-  const gained = Math.floor((now - S.enTs) / stepMs);
-  if (gained > 0) {
-    S.en = Math.min(cap, S.en + gained);
-    S.enTs += gained * stepMs;
-    if (S.en >= cap) S.enTs = now;
-  }
-}
-
-function initNewBoard() {
-  const b = Array(30).fill(null);
-  b[14] = { t: 'gen', k: 'g_wood', l: 1 };
-  b[8] = { t: 'item', k: 'wood', l: 0 };
-  b[13] = { t: 'item', k: 'wood', l: 0 };
-  b[15] = { t: 'item', k: 'wood', l: 1 };
-  const locks = [
-    [0, 'wood', 2], [1, 'wood', 1], [4, 'tool', 0], [5, 'coin', 0],
-    [6, 'wood', 1], [11, 'tool', 1], [18, 'stone', 1], [23, 'coin', 1],
-    [24, 'stone', 2], [25, 'food', 1], [28, 'food', 2], [29, 'coin', 2]
-  ];
-  locks.forEach(([idx, k, l]) => { b[idx] = { t: 'item', k, l, lock: true }; });
-  S.board = b;
-  S.orders = [{ id: 'ord_tut', reqs: [{ k: 'wood', l: 2 }], stars: 2, coins: 30 }];
-  refillOrders();
-}
-
-/* ===== ORDERS GENERATOR ===== */
-function makeOrder() {
-  const st = S.stage;
-  const availChains = ['wood'];
-  if (S.built.quarry_b || st >= 2) availChains.push('stone');
-  if (S.built.field || st >= 3) availChains.push('food');
-  if (st >= 1) availChains.push('tool');
-
-  const maxTier = Math.min(5, 2 + st);
-  const count = st === 0 ? 1 : (Math.random() < 0.55 ? 2 : 1);
-  const reqs = [];
-  for (let i = 0; i < count; i++) {
-    const ch = availChains[Math.random() * availChains.length | 0];
-    const capL = Math.min(CHAINS[ch].items.length - 2, maxTier);
-    const l = Math.max(1, Math.min(capL, 1 + (Math.random() * (st + 2) | 0)));
-    reqs.push({ k: ch, l });
-  }
-  const value = reqs.reduce((a, r) => a + Math.round(Math.pow(2.15, r.l) * 8), 0);
-  const stars = Math.max(1, Math.round(value / 24));
-  const coins = Math.max(12, Math.round(value * (S.built.market ? 1.15 : 1)));
-  return { id: Math.random().toString(36).slice(2, 8), reqs, stars, coins };
-}
-
-function refillOrders() {
-  while (S.orders.length < 3) S.orders.push(makeOrder());
-}
-
-/* ===== ISLAND DIORAMA & WALKING FACELESS VILLAGERS ===== */
-const VILLAGERS = [
-  { x: 170, y: 128, tx: 140, ty: 118, col: '#ff7043', spd: 0.28, wait: 0 },
-  { x: 195, y: 122, tx: 220, ty: 130, col: '#42a5f5', spd: 0.24, wait: 40 }
-];
-const EXTRA_VILLAGER_COLS = ['#ab47bc', '#26a69a', '#ffa726', '#ec407a'];
-
-function syncVillagerCount() {
-  let target = 2;
-  if (S.built.fire) target++;
-  if (S.built.pier) target++;
-  if (S.built.forge) target++;
-  if (S.built.workshop) target++;
-  while (VILLAGERS.length < target) {
-    const col = EXTRA_VILLAGER_COLS[(VILLAGERS.length - 2) % EXTRA_VILLAGER_COLS.length];
-    VILLAGERS.push({ x: 190, y: 115, tx: 160, ty: 120, col, spd: 0.22 + Math.random() * 0.1, wait: 20 });
-  }
-}
-
-function getWalkTargets() {
-  const pts = [{ x: 175, y: 132 }, { x: 205, y: 124 }, { x: 155, y: 118 }];
-  BUILDINGS.forEach(b => {
-    if (S.built[b.id] && b.id !== 'boat') pts.push({ x: b.x, y: b.y + 8 });
-  });
-  return pts;
-}
-
-function renderIsland() {
-  syncVillagerCount();
-  const b = S.built;
-  const pop = id => (S.lastPop === id ? ' bld-pop' : '');
-  let svg = `
-    <defs>
-      <radialGradient id="lagoon" cx="50%" cy="55%" r="52%">
-        <stop offset="0%" stop-color="#8cf5ec" stop-opacity=".75"/>
-        <stop offset="100%" stop-color="#3cc4bd" stop-opacity="0"/>
-      </radialGradient>
-    </defs>
-    <ellipse cx="200" cy="118" rx="165" ry="74" fill="url(#lagoon)"/>
-    <ellipse class="wave-ring" cx="200" cy="118" rx="146" ry="62" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-dasharray="18 12"/>
-    <ellipse class="wave-ring" style="animation-delay:-1.8s" cx="200" cy="118" rx="134" ry="54" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-dasharray="10 14"/>
-
-    <path d="M74,118 C72,78 135,54 205,56 C278,58 332,84 328,122 C324,158 265,172 198,170 C128,168 76,154 74,118 Z" fill="#f7e8c8" stroke="#e4cfa3" stroke-width="3"/>
-    <path d="M92,114 C90,82 144,62 204,64 C266,66 310,88 306,118 C302,146 254,156 198,154 C140,152 94,142 92,114 Z" fill="#7bd876"/>
-    <ellipse cx="195" cy="92" rx="82" ry="26" fill="#68c765"/>
-    <path d="M128,116 Q168,132 202,122 T276,144 M150,86 Q192,102 242,88" fill="none" stroke="#f3dfb6" stroke-width="6" stroke-linecap="round"/>
-
-    <g class="palm"><path d="M108,126 Q104,108 109,94" stroke="#8d6e63" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M109,94 Q95,89 91,98 M109,94 Q103,81 114,82 M109,94 Q122,88 124,98" stroke="#2e7d32" stroke-width="3.5" fill="none" stroke-linecap="round"/></g>
-    <g class="palm" style="animation-delay:-1.5s"><path d="M294,112 Q298,96 292,84" stroke="#8d6e63" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M292,84 Q279,80 276,89 M292,84 Q291,72 301,74 M292,84 Q305,81 306,90" stroke="#388e3c" stroke-width="3.5" fill="none" stroke-linecap="round"/></g>
-  `;
-
-  if (b.tent) svg += `<g class="${pop('tent')}" transform="translate(110,94)"><polygon points="15,2 0,24 30,24" fill="#ff8a65" stroke="#bf360c" stroke-width="1.5"/><polygon points="15,2 10,24 20,24" fill="#ffe0b2"/></g>`;
-  if (b.fire) svg += `<g class="${pop('fire')}" transform="translate(157,118)"><ellipse cx="8" cy="13" rx="9" ry="3.5" fill="#78909c"/><path d="M8,2 C13,7 12,12 8,12 C4,12 3,7 8,2 Z" fill="#ff7043"/><path d="M8,6 C10,9 10,12 8,12 C6,12 6,9 8,6 Z" fill="#ffd54f"/></g>`;
-  if (b.bridge) svg += `<g class="${pop('bridge')}" transform="translate(212,124)"><rect x="0" y="4" width="26" height="10" rx="2" fill="#a1887f" stroke="#5d4037" stroke-width="1.5"/><path d="M4,4v10M10,4v10M16,4v10M22,4v10" stroke="#5d4037" stroke-width="1.2"/></g>`;
-
-  if (b.hut) svg += `<g class="${pop('hut')}" transform="translate(238,96)"><rect x="4" y="10" width="24" height="16" rx="2" fill="#ffe0b2" stroke="#8d6e63" stroke-width="1.5"/><polygon points="1,11 16,1 31,11" fill="#29b6f6"/><rect x="13" y="17" width="6" height="9" fill="#6d4c41"/></g>`;
-  if (b.pier) svg += `<g class="${pop('pier')}" transform="translate(268,140)"><rect x="0" y="3" width="34" height="9" rx="2" fill="#8d6e63"/><rect x="4" y="12" width="3" height="6" fill="#5d4037"/><rect x="26" y="12" width="3" height="6" fill="#5d4037"/></g>`;
-  if (b.boat) svg += `<g class="boat-bob${pop('boat')}" transform="translate(314,144)"><path d="M2,14 L26,14 L22,21 L6,21 Z" fill="#ef5350"/><polygon points="14,2 14,13 24,13" fill="#ffffff"/><line x1="14" y1="2" x2="14" y2="14" stroke="#5d4037" stroke-width="1.5"/></g>`;
-
-  if (b.lighthouse) svg += `<g class="${pop('lighthouse')}" transform="translate(80,50)"><polygon points="8,38 11,10 17,10 20,38" fill="#ffffff" stroke="#cfd8dc" stroke-width="1.2"/><rect x="9" y="20" width="10" height="5" fill="#ef5350"/><rect x="10" y="6" width="8" height="5" fill="#ffd54f"/><polygon points="14,3 8,7 20,7" fill="#ef5350"/></g>`;
-  if (b.quarry_b) svg += `<g class="${pop('quarry_b')}" transform="translate(132,68)"><polygon points="2,18 10,4 22,6 28,18" fill="#90a4ae"/><rect x="8" y="11" width="10" height="7" fill="#455a64"/></g>`;
-  if (b.forge) svg += `<g class="${pop('forge')}" transform="translate(174,58)"><rect x="4" y="10" width="24" height="14" rx="2" fill="#78909c"/><polygon points="2,11 16,3 30,11" fill="#455a64"/><rect x="21" y="1" width="5" height="9" fill="#546e7a"/><circle class="smoke" cx="23" cy="0" r="3" fill="#eceff1"/></g>`;
-
-  if (b.field) svg += `<g class="${pop('field')}" transform="translate(224,74)"><rect x="0" y="2" width="28" height="14" rx="3" fill="#fdd835" stroke="#f9a825" stroke-width="1.2"/><path d="M4,5h20M4,9h20M4,13h20" stroke="#f57f17" stroke-width="1.3"/></g>`;
-  if (b.mill) svg += `<g class="${pop('mill')}" transform="translate(272,56)"><polygon points="8,32 11,10 19,10 22,32" fill="#fff8e1" stroke="#bcaaa4" stroke-width="1.2"/><polygon points="15,4 9,11 21,11" fill="#ff7043"/><g class="mill-blades"><line x1="15" y1="2" x2="15" y2="24" stroke="#6d4c41" stroke-width="2"/><line x1="4" y1="13" x2="26" y2="13" stroke="#6d4c41" stroke-width="2"/></g></g>`;
-  if (b.bakery) svg += `<g class="${pop('bakery')}" transform="translate(198,86)"><rect x="3" y="9" width="24" height="14" rx="3" fill="#ffcc80" stroke="#e65100" stroke-width="1.2"/><path d="M2,10 Q15,0 28,10 Z" fill="#ef5350"/><circle cx="15" cy="16" r="4" fill="#5d4037"/></g>`;
-
-  if (b.workshop) svg += `<g class="${pop('workshop')}" transform="translate(148,86)"><rect x="3" y="9" width="24" height="14" rx="2" fill="#b3e5fc" stroke="#0288d1" stroke-width="1.2"/><polygon points="1,10 15,2 29,10" fill="#0288d1"/></g>`;
-  if (b.market) svg += `<g class="${pop('market')}" transform="translate(254,118)"><rect x="3" y="10" width="24" height="12" fill="#fff"/><path d="M1,10 L5,4 L25,4 L29,10 Z" fill="#ab47bc"/></g>`;
-  if (b.hall) svg += `<g class="${pop('hall')}" transform="translate(184,38)"><rect x="4" y="12" width="26" height="18" rx="2" fill="#fff" stroke="#ffb300" stroke-width="1.5"/><polygon points="1,13 17,2 33,13" fill="#ffb300"/><circle cx="17" cy="18" r="3.5" fill="#29b6f6"/></g>`;
-
-  svg += '<g id="villagers-layer"></g>';
-  svg += '<g class="gull" transform="translate(0,26)"><path d="M0,4 Q5,0 10,4 Q15,0 20,4" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/></g>';
-
-  $('#island-svg').innerHTML = svg;
-  updateVillagersDOM();
-}
-
-function updateVillagersDOM() {
-  const layer = $('#villagers-layer');
-  if (!layer) return;
-  const t = performance.now() / 140;
-  layer.innerHTML = VILLAGERS.map((v, i) => {
-    const bob = v.wait > 0 ? 0 : Math.abs(Math.sin(t + i * 2)) * 2.2;
-    return `<g transform="translate(${v.x.toFixed(1)},${(v.y - bob).toFixed(1)})">
-      <ellipse cx="0" cy="2" rx="3.5" ry="1.5" fill="rgba(0,0,0,.2)"/>
-      <rect x="-2.6" y="-6" width="5.2" height="7" rx="2.5" fill="${v.col}"/>
-      <circle cx="0" cy="-9" r="2.7" fill="#ffe0b2"/>
-    </g>`;
-  }).join('');
-}
-
-function stepVillagers() {
-  const targets = getWalkTargets();
-  VILLAGERS.forEach(v => {
-    if (v.wait > 0) { v.wait--; return; }
-    const dx = v.tx - v.x, dy = v.ty - v.y;
-    const dist = Math.hypot(dx, dy);
-    if (dist < 2) {
-      v.wait = 45 + (Math.random() * 60 | 0);
-      const next = targets[Math.random() * targets.length | 0];
-      v.tx = next.x + (Math.random() * 14 - 7);
-      v.ty = next.y + (Math.random() * 8 - 4);
-    } else {
-      v.x += (dx / dist) * v.spd;
-      v.y += (dy / dist) * v.spd;
-    }
-  });
-  updateVillagersDOM();
-  requestAnimationFrame(stepVillagers);
-}
-
-/* ===== BOARD INTERACTION (TAP + DRAG & DROP) ===== */
-let selIdx = -1;
-let dragIdx = -1;
-
-function flt(txt, x, y, col) {
-  const d = document.createElement('div');
-  d.textContent = txt;
-  d.style.cssText = `left:${x}px;top:${y}px;color:${col || '#263849'}`;
-  $('#fl').appendChild(d);
-  setTimeout(() => d.remove(), 850);
-}
-
-function isNeeded(k, l) {
-  return S.orders.some(o => o.reqs.some(r => r.k === k && r.l === l));
-}
-
-function renderBoard(popIndex = -1) {
-  const bEl = $('#board');
-  bEl.innerHTML = S.board.map((c, i) => {
-    const alt = ((Math.floor(i / 6) + (i % 6)) % 2) ? ' alt' : '';
-    const sel = i === selIdx ? ' sel' : '';
-    const lock = c && c.lock ? ' locked' : '';
-    let match = '';
-    if (selIdx >= 0 && selIdx !== i && c && !lock) {
-      const sc = S.board[selIdx];
-      if (sc && sc.t === 'item' && c.t === 'item' && sc.k === c.k && sc.l === c.l && sc.l < CHAINS[c.k].items.length - 1) {
-        match = ' match';
-      }
-    } else if (selIdx >= 0 && selIdx !== i && c && c.lock) {
-      const sc = S.board[selIdx];
-      if (sc && sc.t === 'item' && sc.k === c.k && sc.l === c.l) match = ' match';
-    }
-
-    let inner = '';
-    if (c) {
-      const anim = i === popIndex ? ' merge-anim' : '';
-      inner += `<div class="${anim}" style="width:100%;height:100%;display:grid;place-items:center">${itemSVG(c.k, c.l)}</div>`;
-      if (c.t === 'item') {
-        inner += `<span class="lvl-dot">${c.l + 1}</span>`;
-        if (!c.lock && isNeeded(c.k, c.l)) inner += `<span class="need-dot"></span>`;
-      } else {
-        inner += `<span class="gen-ring">⚡</span>`;
-      }
-    }
-    return `<div class="cell${alt}${sel}${match}${lock}" data-i="${i}">${inner}</div>`;
-  }).join('');
-  renderSelBar();
-}
-
-function renderSelBar() {
-  const txt = $('#sel-txt'), acts = $('#sel-acts');
-  acts.innerHTML = '';
-  if (selIdx < 0 || !S.board[selIdx]) {
-    txt.textContent = 'Нажми на рощу ⚡ для добычи или соединяй пары';
-    return;
-  }
-  const c = S.board[selIdx];
-  if (c.t === 'gen') {
-    const g = GENS[c.k];
-    const lvl = S.genLvl[c.k] || 1;
-    txt.innerHTML = `<b>${g.name}</b> (Ур. ${lvl}) — нажми ещё раз (-1⚡)`;
-    const btn = document.createElement('button');
-    btn.className = 'btn-use';
-    btn.textContent = 'Добыть ⚡';
-    btn.onclick = () => triggerGen(selIdx);
-    acts.appendChild(btn);
-    return;
-  }
-  const ch = CHAINS[c.k];
-  const name = ch.items[c.l];
-  if (c.lock) {
-    txt.innerHTML = `🔒 <b>${name}</b> (Ур. ${c.l + 1}) — объедини с таким же!`;
-    return;
-  }
-  txt.innerHTML = `<b>${name}</b> (${ch.name} • Ур. ${c.l + 1}/${ch.items.length})`;
-
-  if (c.k === 'coin' && c.l === 3) {
-    const op = document.createElement('button');
-    op.className = 'btn-use';
-    op.textContent = 'Открыть 🎁';
-    op.onclick = () => openChest(selIdx);
-    acts.appendChild(op);
-  } else if (c.k === 'coin') {
-    const col = document.createElement('button');
-    col.className = 'btn-use';
-    const val = [3, 10, 30][c.l] || 3;
-    col.textContent = `Забрать +${val}🪙`;
-    col.onclick = () => collectCoin(selIdx, val);
-    acts.appendChild(col);
-  }
-
-  if (isTutActive()) return;
-  if (S.bag.length < 4) {
-    const bg = document.createElement('button');
-    bg.className = 'btn-bag';
-    bg.textContent = 'В склад 🎒';
-    bg.onclick = () => moveToBag(selIdx);
-    acts.appendChild(bg);
-  }
-
-  const sellVal = Math.max(1, Math.pow(2, c.l));
-  const sb = document.createElement('button');
-  sb.className = 'btn-sell';
-  sb.textContent = `Продать +${sellVal}🪙`;
-  sb.onclick = () => {
-    S.coins += sellVal;
-    S.board[selIdx] = null;
-    selIdx = -1;
-    sfxTap(); hap('light');
-    updateAll();
-  };
-  acts.appendChild(sb);
-}
-
-function collectCoin(idx, val) {
-  const el = document.querySelector(`.cell[data-i="${idx}"]`);
-  const r = el ? el.getBoundingClientRect() : { left: 150, top: 300 };
-  S.coins += val;
-  S.board[idx] = null;
-  selIdx = -1;
-  sOrder(); hap('medium');
-  flt(`+${val} 🪙`, r.left + 10, r.top, '#d97706');
-  updateAll();
-}
-
-function openChest(idx) {
-  const el = document.querySelector(`.cell[data-i="${idx}"]`);
-  const r = el ? el.getBoundingClientRect() : { left: 150, top: 300 };
-  S.coins += 75;
-  S.en = Math.min(maxEn() + 15, S.en + 12);
-  S.board[idx] = null;
-  selIdx = -1;
-  sOrder(); note('success');
-  flt('+75 🪙 +12 ⚡', r.left - 10, r.top, '#0288d1');
-  updateAll();
-}
-
-function moveToBag(idx) {
-  if (S.bag.length >= 4 || !S.board[idx] || S.board[idx].lock) return;
-  S.bag.push(S.board[idx]);
-  S.board[idx] = null;
-  selIdx = -1;
-  sfxTap(); hap('light');
-  updateAll();
-}
-
-function triggerGen(idx) {
-  const c = S.board[idx];
-  if (!c || c.t !== 'gen') return;
-  regenEnergy();
-  const el = document.querySelector(`.cell[data-i="${idx}"]`);
-  const rect = el ? el.getBoundingClientRect() : { left: 150, top: 300 };
-
-  if (S.en <= 0) {
-    flt('Мало энергии ⚡', rect.left - 15, rect.top, '#ef4444');
-    note('error');
-    return;
-  }
-  const empty = [];
-  S.board.forEach((cell, i) => { if (!cell) empty.push(i); });
-  if (!empty.length) {
-    flt('Нет места на поле!', rect.left - 25, rect.top, '#ef4444');
-    note('error');
-    return;
-  }
-
-  S.en--;
-  if (S.en === maxEn() - 1) S.enTs = Date.now();
-
-  const g = GENS[c.k];
-  const gLvl = S.genLvl[c.k] || 1;
-  const isSub = Math.random() < g.subChance;
-  const chainKey = isSub ? g.sub : g.chain;
-  const tier2Chance = (gLvl - 1) * 0.12;
-  const lvl = (!isSub && Math.random() < tier2Chance) ? 1 : 0;
-
-  empty.sort((a, b) => {
-    const da = Math.hypot((a % 6) - (idx % 6), Math.floor(a / 6) - Math.floor(idx / 6));
-    const db = Math.hypot((b % 6) - (idx % 6), Math.floor(b / 6) - Math.floor(idx / 6));
-    return da - db;
-  });
-  const targetIdx = empty[0];
-  S.board[targetIdx] = { t: 'item', k: chainKey, l: lvl };
-  S.seen[chainKey][lvl] = 1;
-  if (S.tut === 0) advanceTut(0);
-  sSpawn(); hap('light');
-  updateAll(targetIdx);
-}
-
-function handleCellPair(from, to) {
-  if (from === to) return;
-  const A = S.board[from], B = S.board[to];
-  if (!A || A.lock) return;
-
-  if (!B) {
-    S.board[to] = A;
-    S.board[from] = null;
-    selIdx = to;
-    sfxTap();
-    updateAll();
-    return;
-  }
-
-  if (A.t === 'item' && B.t === 'item' && A.k === B.k && A.l === B.l) {
-    const maxL = CHAINS[A.k].items.length - 1;
-    if (A.l >= maxL) {
-      selIdx = to;
-      renderBoard();
-      return;
-    }
-    const nextL = A.l + 1;
-    S.board[to] = { t: 'item', k: A.k, l: nextL };
-    S.board[from] = null;
-    S.seen[A.k][nextL] = 1;
-    selIdx = to;
-
-    const el = document.querySelector(`.cell[data-i="${to}"]`);
-    const r = el ? el.getBoundingClientRect() : { left: 160, top: 300 };
-    sMerge(nextL); hap('medium');
-
-    if (nextL >= 3 && Math.random() < 0.35) {
-      const emp = S.board.findIndex(x => !x);
-      if (emp >= 0) {
-        S.board[emp] = { t: 'item', k: 'coin', l: 0 };
-        S.seen.coin[0] = 1;
-      }
-    }
-    if (B.lock) {
-      if (S.tut === 2) advanceTut(2);
-      flt('Клетка открыта! ✨', r.left - 20, r.top - 10, '#16a34a');
-    } else {
-      if (S.tut === 1) advanceTut(1);
-      flt(CHAINS[A.k].items[nextL], r.left - 10, r.top - 8, '#263849');
-    }
-    updateAll(to);
-    return;
-  }
-
-  if (!B.lock) {
-    S.board[to] = A;
-    S.board[from] = B;
-    selIdx = to;
-    sfxTap();
-    updateAll();
-  } else {
-    selIdx = to;
-    renderBoard();
-  }
-}
-
-const boardEl = $('#board');
-const ghostEl = $('#ghost');
-let ptrDownIdx = -1, isDragging = false, startX = 0, startY = 0;
-
-boardEl.addEventListener('pointerdown', e => {
-  const cell = e.target.closest('.cell');
-  if (!cell) return;
-  const idx = +cell.dataset.i;
-  ptrDownIdx = idx;
-  isDragging = false;
-  startX = e.clientX; startY = e.clientY;
-});
-
-window.addEventListener('pointermove', e => {
-  if (ptrDownIdx < 0) return;
-  const c = S.board[ptrDownIdx];
-  if (!c || c.lock) return;
-  if (!isDragging && Math.hypot(e.clientX - startX, e.clientY - startY) > 10) {
-    isDragging = true;
-    dragIdx = ptrDownIdx;
-    selIdx = ptrDownIdx;
-    ghostEl.innerHTML = itemSVG(c.k, c.l);
-    ghostEl.style.display = 'block';
-    renderBoard();
-  }
-  if (isDragging) {
-    ghostEl.style.left = e.clientX + 'px';
-    ghostEl.style.top = e.clientY + 'px';
-  }
-});
-
-window.addEventListener('pointerup', e => {
-  if (ptrDownIdx < 0) return;
-  if (isDragging) {
-    ghostEl.style.display = 'none';
-    const el = document.elementFromPoint(e.clientX, e.clientY);
-    const targetCell = el && el.closest('.cell');
-    if (targetCell) {
-      handleCellPair(dragIdx, +targetCell.dataset.i);
-    }
-  } else {
-    const idx = ptrDownIdx;
-    const c = S.board[idx];
-    if (selIdx === idx) {
-      if (c && c.t === 'gen') triggerGen(idx);
-      else if (c && c.t === 'item' && !c.lock && c.k === 'coin' && c.l === 3) openChest(idx);
-      else if (c && c.t === 'item' && !c.lock && c.k === 'coin') collectCoin(idx, [3, 10, 30][c.l]);
-      else { selIdx = -1; renderBoard(); }
-    } else if (selIdx >= 0 && S.board[selIdx] && !S.board[selIdx].lock && c && c.t === 'item' && S.board[selIdx].t === 'item' && S.board[selIdx].k === c.k && S.board[selIdx].l === c.l) {
-      handleCellPair(selIdx, idx);
-    } else {
-      selIdx = c ? idx : -1;
-      sfxTap();
-      renderBoard();
-    }
-  }
-  ptrDownIdx = -1;
-  dragIdx = -1;
-  isDragging = false;
-});
-
-/* ===== ORDERS RENDER & FULFILL ===== */
-function checkOrderReady(ord) {
-  const used = new Set();
-  return ord.reqs.map(r => {
-    const idx = S.board.findIndex((c, i) => !used.has(i) && c && c.t === 'item' && !c.lock && c.k === r.k && c.l === r.l);
-    if (idx >= 0) { used.add(idx); return idx; }
-    return -1;
-  });
-}
-
-function renderOrders() {
-  const wrap = $('#orders');
-  wrap.innerHTML = S.orders.map((o, oi) => {
-    const matches = checkOrderReady(o);
-    const ready = matches.every(i => i >= 0);
-    const itemsHtml = o.reqs.map((r, ri) => {
-      const has = matches[ri] >= 0;
-      return `<div class="ord-it${has ? ' has' : ''}" title="${CHAINS[r.k].items[r.l]}">
-        <div style="width:30px;height:30px">${itemSVG(r.k, r.l)}</div>
-        ${has ? '<span class="chk">✓</span>' : ''}
-      </div>`;
-    }).join('');
-    return `<div class="ord${ready ? ' ready' : ''}">
-      <div class="ord-items">${itemsHtml}</div>
-      <div class="ord-rew">+${o.coins}🪙<br>+${o.stars}⭐</div>
-      <button class="ord-go" data-oi="${oi}" ${ready ? '' : 'disabled'}>Сдать</button>
-    </div>`;
-  }).join('');
-}
-
-$('#orders').onclick = e => {
-  const btn = e.target.closest('.ord-go');
-  if (!btn) return;
-  const oi = +btn.dataset.oi;
-  const ord = S.orders[oi];
-  if (!ord) return;
-  const matches = checkOrderReady(ord);
-  if (matches.some(i => i < 0)) return;
-
-  matches.forEach(idx => { S.board[idx] = null; });
-  S.coins += ord.coins;
-  S.stars += ord.stars;
-  selIdx = -1;
-  S.orders.splice(oi, 1);
-  if (S.tut === 3) advanceTut(3);
-  refillOrders();
-
-  const r = btn.getBoundingClientRect();
-  sOrder(); note('success');
-  flt(`+${ord.coins}🪙 +${ord.stars}⭐`, r.left - 20, r.top + 30, '#16a34a');
-  updateAll();
-};
-
-/* ===== MODALS: BUILD, BAG, ATLAS, SETTINGS ===== */
-let curTab = 'board';
-if (tg && tg.BackButton) {
-  try { tg.BackButton.onClick(() => { if (curTab !== 'board') openModal('board'); }); } catch (e) {}
-}
-function openModal(tab) {
-  if (isTutActive() && tab !== 'board' && !(S.tut === 4 && tab === 'build')) return;
-  curTab = tab;
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
-  if (tg && tg.BackButton) {
-    try { tab === 'board' ? tg.BackButton.hide() : tg.BackButton.show(); } catch (e) {}
-  }
-  if (tab === 'board') { $('#modal').classList.remove('on'); return; }
-  $('#modal').classList.add('on');
-  renderModal();
-}
-
-function renderModal() {
-  const title = $('#m-title'), body = $('#m-body');
-  if (curTab === 'build') {
-    title.textContent = `🏗 Стройка острова (Этап ${S.stage + 1}/5)`;
-    const stageBlds = BUILDINGS.filter(b => b.st <= S.stage);
-    const genKeys = ['g_wood', ...(S.built.quarry_b ? ['g_stone'] : []), ...(S.built.field ? ['g_food'] : [])];
-    const genHtml = genKeys.map(gk => {
-      const g = GENS[gk], lvl = S.genLvl[gk] || 1, mx = lvl >= 3;
-      const cost = lvl === 1 ? 180 : 420;
-      return `<div class="card-row">
-        <div style="display:flex;align-items:center;gap:10px">
-          <div style="width:42px;height:42px;flex:none">${itemSVG(gk, 0)}</div>
-          <div><b>${g.name} • Ур. ${lvl}/3</b><div style="font-size:12px;color:var(--muted)">Шанс предмета 2-го ур.: ${lvl * 12}%</div></div>
-        </div>
-        <button class="act-btn" data-upgen="${gk}" ${mx || S.coins < cost ? 'disabled' : ''}>${mx ? 'Макс' : cost + ' 🪙'}</button>
-      </div>`;
-    }).join('');
-
-    const bldHtml = stageBlds.map(b => {
-      const done = !!S.built[b.id];
-      const can = !done && S.stars >= b.stars && S.coins >= b.coins;
-      return `<div class="card-row${done ? ' done' : ''}">
-        <div>
-          <b>${done ? '✅ ' : '🔨 '}${b.name}</b>
-          <div style="font-size:12px;color:var(--muted)">${b.desc}</div>
-          ${done ? '' : `<div style="font-size:12px;font-weight:800;margin-top:2px">Нужно: ${b.stars}⭐ и ${b.coins}🪙</div>`}
-        </div>
-        <button class="act-btn" data-bld="${b.id}" ${done || !can ? 'disabled' : ''}>${done ? 'Построено' : 'Построить'}</button>
-      </div>`;
-    }).join('');
-
-    body.innerHTML = `<div style="font-size:12px;font-weight:800;color:var(--muted)">ПОСТРОЙКИ ЭТАПА</div>${bldHtml}
-      <div style="font-size:12px;font-weight:800;color:var(--muted);margin-top:6px">УЛУЧШЕНИЕ ИСТОЧНИКОВ</div>${genHtml}`;
-  } else if (curTab === 'bag') {
-    title.textContent = `🎒 Склад (${S.bag.length}/4)`;
-    const slots = [0, 1, 2, 3].map(i => {
-      const it = S.bag[i];
-      if (!it) return `<div class="bag-slot"><span style="font-size:11px;color:#a89878">Пусто</span></div>`;
-      return `<div class="bag-slot filled" data-bi="${i}" title="Вернуть на поле">
-        <div style="width:65%;height:65%">${itemSVG(it.k, it.l)}</div>
-        <span class="lvl-dot">${it.l + 1}</span>
-      </div>`;
-    }).join('');
-    body.innerHTML = `<p style="margin:0;font-size:13px;color:var(--muted)">Нажми на предмет на складе, чтобы вернуть его на свободную клетку поля.</p>
-      <div class="bag-grid">${slots}</div>`;
-  } else if (curTab === 'atlas') {
-    title.textContent = '📖 Атлас открытий';
-    body.innerHTML = Object.keys(CHAINS).map(k => {
-      const ch = CHAINS[k];
-      const cells = ch.items.map((nm, l) => {
-        const ok = S.seen[k] && S.seen[k][l];
-        return `<div class="atlas-cell${ok ? '' : ' unk'}">
-          <div style="width:28px;height:28px">${ok ? itemSVG(k, l) : '❓'}</div>
-          <span>${ok ? nm : '???'}</span>
-        </div>`;
-      }).join('');
-      return `<div class="atlas-chain"><b>${ch.name}</b><div class="atlas-items">${cells}</div></div>`;
-    }).join('');
-  } else if (curTab === 'audio') {
-    title.textContent = '🎵 Музыка и настройки';
-    body.innerHTML = `
-      <div class="card-row">
-        <div><b>Фоновая музыка</b><div style="font-size:12px;color:var(--muted)">Автоматически играет <code>music.mp3</code> из папки игры</div></div>
-        <button class="act-btn" id="tog-snd">${S.mute ? 'Включить 🔊' : 'Выключить 🔇'}</button>
-      </div>
-      <div class="card-row">
-        <div><b>Проверить свой трек прямо сейчас</b><div style="font-size:12px;color:var(--muted)">Выбери MP3/OGG с телефона для теста</div></div>
-        <label class="act-btn" style="cursor:pointer">Выбрать файл<input type="file" id="pick-mp3" accept="audio/*" style="display:none"></label>
-      </div>
-      <div class="card-row">
-        <div><b>Обучение</b><div style="font-size:12px;color:var(--muted)">Пройти подсказки островитянина заново</div></div>
-        <button class="act-btn" style="background:#0288d1;box-shadow:0 3px 0 #0369a1" id="rpl-tut">Повторить</button>
-      </div>
-      <div class="card-row">
-        <div><b>Сброс прогресса</b><div style="font-size:12px;color:var(--muted)">Начать остров заново</div></div>
-        <button class="act-btn" style="background:#ef4444;box-shadow:0 3px 0 #991b1b" id="rst-game">Сбросить</button>
-      </div>`;
-  }
-}
-
-$('#m-body').onclick = e => {
-  const bBtn = e.target.closest('[data-bld]');
-  if (bBtn) {
-    const b = BUILDINGS.find(x => x.id === bBtn.dataset.bld);
-    if (!b || S.built[b.id] || S.stars < b.stars || S.coins < b.coins) return;
-    S.stars -= b.stars;
-    S.coins -= b.coins;
-    S.built[b.id] = 1;
-    S.lastPop = b.id;
-    if (S.tut === 4) advanceTut(4);
-
-    if (b.grantGen) {
-      const emp = S.board.findIndex(x => !x);
-      if (emp >= 0) S.board[emp] = { t: 'gen', k: b.grantGen, l: 1 };
-      else S.bag.push({ t: 'gen', k: b.grantGen, l: 1 });
-    }
-
-    const stBlds = STAGES[S.stage].blds;
-    if (stBlds.every(id => S.built[id]) && S.stage < STAGES.length - 1) {
-      S.stage++;
-      S.en = maxEn();
-      refillOrders();
-    }
-
-    sBuild(); note('success');
-    openModal('board');
-    updateAll();
-    setTimeout(() => { S.lastPop = ''; }, 900);
-    return;
-  }
-
-  const gBtn = e.target.closest('[data-upgen]');
-  if (gBtn) {
-    const gk = gBtn.dataset.upgen;
-    const lvl = S.genLvl[gk] || 1;
-    const cost = lvl === 1 ? 180 : 420;
-    if (lvl >= 3 || S.coins < cost) return;
-    S.coins -= cost;
-    S.genLvl[gk] = lvl + 1;
-    sBuild(); hap('medium');
-    renderModal();
-    updateHud();
-    save();
-    return;
-  }
-
-  const bagSlot = e.target.closest('[data-bi]');
-  if (bagSlot) {
-    const bi = +bagSlot.dataset.bi;
-    const emp = S.board.findIndex(x => !x);
-    if (emp < 0) { flt('Нет места на поле!', 120, 260, '#ef4444'); return; }
-    S.board[emp] = S.bag[bi];
-    S.bag.splice(bi, 1);
-    sfxTap(); hap('light');
-    renderModal();
-    updateAll(emp);
-    return;
-  }
-
-  if (e.target.id === 'tog-snd') {
-    S.mute = S.mute ? 0 : 1;
-    syncAudio();
-    renderModal();
-    save();
-  }
-  if (e.target.id === 'rpl-tut') { S.tut = 0; openModal('board'); updateAll(); return; }
-  if (e.target.id === 'rst-game') {
-    localStorage.removeItem(SAVE_KEY);
-    location.reload();
-  }
-};
-
-$('#m-body').onchange = e => {
-  if (e.target.id === 'pick-mp3' && e.target.files[0]) {
-    if (customBlobUrl) URL.revokeObjectURL(customBlobUrl);
-    customBlobUrl = URL.createObjectURL(e.target.files[0]);
-    bgm.src = customBlobUrl;
-    bgmReady = true;
-    S.mute = 0;
-    syncAudio();
-    flt('Трек загружен! 🎵', 120, 220, '#0f766e');
-  }
-};
-
-$('#m-close').onclick = () => openModal('board');
-$('#modal').onclick = e => { if (e.target.id === 'modal') openModal('board'); };
-$('#btn-build').onclick = () => openModal('build');
-$('#btn-mute').onclick = () => openModal('audio');
-$('#tut-skip').onclick = () => { S.tut = 5; sfxTap(); updateAll(); };
-$('#nav').addEventListener('click', e => {
-  const btn = e.target.closest('.nav-btn');
-  if (btn) openModal(btn.dataset.tab);
-});
-
-/* ===== INTERACTIVE VILLAGER TUTORIAL (5 STEPS, NO REWARD) ===== */
-const TUT_STEPS = [
-  { tag: 'Шаг 1/5 • Добыча', msg: 'Нажми на <b>Лесную рощу ⚡</b> в центре поля, чтобы добыть ресурс!' },
-  { tag: 'Шаг 2/5 • Слияние', msg: 'Перетащи <b>Ветку</b> на другую такую же <b>Ветку</b>, чтобы получить Бревно.' },
-  { tag: 'Шаг 3/5 • Пыль', msg: 'Перетащи свободное <b>Бревно</b> на запылённое <b>Бревно</b>, чтобы открыть клетку!' },
-  { tag: 'Шаг 4/5 • Заказ', msg: 'Отлично! Нажми <b>Сдать</b> на первом заказе сверху за монеты и звёзды.' },
-  { tag: 'Шаг 5/5 • Стройка', msg: 'Нажми <b>🔨 Строить</b> и возведи <b>Костёр путешественника</b>!' }
-];
-
-function isTutActive() {
-  return typeof S.tut === 'number' && S.tut >= 0 && S.tut < 5;
-}
-
-function advanceTut(stepCompleted) {
-  if (S.tut !== stepCompleted) return;
-  S.tut++;
-  if (S.tut >= 5) {
-    S.tut = 5;
-    note('success');
-    flt('Обучение завершено! 🏝', 95, 240, '#0f766e');
-  }
-}
-
-function renderTutorial() {
-  const box = $('#tut-box');
-  const active = isTutActive();
-  document.body.classList.toggle('tut-active', active);
-  box.classList.toggle('on', active);
-
-  document.querySelectorAll('.tut-pulse').forEach(el => el.classList.remove('tut-pulse'));
-  document.querySelectorAll('.tut-dim').forEach(el => el.classList.remove('tut-dim'));
-
-  if (!active) return;
-
-  const st = TUT_STEPS[S.tut];
-  $('#tut-step').textContent = st.tag;
-  $('#tut-msg').innerHTML = st.msg;
-
-  $('#btn-mute').classList.add('tut-dim');
-  if (S.tut < 4) {
-    $('#btn-build').classList.add('tut-dim');
-    $('#nav').classList.add('tut-dim');
-  } else {
-    $('#btn-build').classList.add('tut-pulse');
-    document.querySelectorAll('.nav-btn').forEach(b => {
-      if (b.dataset.tab === 'build') b.classList.add('tut-pulse');
-      else b.classList.add('tut-dim');
-    });
-  }
-
-  if (S.tut !== 3) {
-    $('#orders').classList.add('tut-dim');
-  } else {
-    const firstGo = $('#orders .ord-go');
-    if (firstGo) firstGo.classList.add('tut-pulse');
-  }
-
-  if (S.tut === 0) {
-    const gi = S.board.findIndex(c => c && c.t === 'gen');
-    const gEl = gi >= 0 && document.querySelector(`.cell[data-i="${gi}"]`);
-    if (gEl) gEl.classList.add('tut-pulse');
-  } else if (S.tut === 1) {
-    S.board.forEach((c, i) => {
-      if (c && c.t === 'item' && !c.lock && c.k === 'wood' && c.l === 0) {
-        const el = document.querySelector(`.cell[data-i="${i}"]`);
-        if (el) el.classList.add('tut-pulse');
-      }
-    });
-  } else if (S.tut === 2) {
-    S.board.forEach((c, i) => {
-      if (c && c.t === 'item' && c.k === 'wood' && c.l === 1) {
-        const el = document.querySelector(`.cell[data-i="${i}"]`);
-        if (el) el.classList.add('tut-pulse');
-      }
-    });
-  }
-}
-
-/* ===== HUD & LOOP ===== */
-function updateHud() {
-  regenEnergy();
-  const cap = maxEn();
-  $('#h-en').textContent = `${S.en}/${cap}`;
-  if (S.en >= cap) {
-    $('#h-ent').textContent = 'Максимум';
-  } else {
-    const left = Math.max(1, Math.ceil((30000 - ((Date.now() - S.enTs) % 30000)) / 1000));
-    $('#h-ent').textContent = `+1 через ${left}с`;
-  }
-  $('#h-coin').textContent = S.coins;
-  $('#h-star').textContent = S.stars;
-  $('#h-stg').textContent = `Этап ${S.stage + 1}/5`;
-  $('#stage-lbl').textContent = `🏝 ${STAGES[S.stage].name}`;
-  $('#bdg-bag').textContent = `${S.bag.length}/4`;
-
-  const readyBlds = BUILDINGS.filter(b => b.st <= S.stage && !S.built[b.id] && S.stars >= b.stars && S.coins >= b.coins).length;
-  $('#bdg-build').style.display = readyBlds ? 'inline-block' : 'none';
-  $('#bdg-build').textContent = readyBlds;
-  $('#build-cnt').textContent = readyBlds ? `(${readyBlds})` : '';
-  $('#btn-build').classList.toggle('pulse', readyBlds > 0);
-}
-
-function updateAll(popIndex = -1) {
-  updateHud();
-  renderIsland();
-  renderOrders();
-  renderBoard(popIndex);
-  renderTutorial();
-  if (curTab !== 'board') renderModal();
-  save();
-}
-
-/* ===== BOOT ===== */
-store.get(SAVE_KEY).then(raw => {
-  try {
-    if (raw) {
-      const o = JSON.parse(raw);
-      S = Object.assign(S, o);
-      if (typeof o.tut !== 'number') S.tut = 5;
-      S.built = o.built || {};
-      S.genLvl = Object.assign({ g_wood: 1, g_stone: 1, g_food: 1 }, o.genLvl);
-      S.bag = o.bag || [];
-      S.orders = o.orders || [];
-    }
-  } catch (e) {}
-  if (!S.board || S.board.length !== 30) initNewBoard();
-  refillOrders();
-  updateAll();
-  setInterval(updateHud, 1000);
-  requestAnimationFrame(stepVillagers);
-});
-</script>
-</body>
-</html>
+/* ===== Telegram ===== */
+const tg=window.Telegram&&Telegram.WebApp,$=s=>document.querySelector(s);
+const user=(tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user&&tg.initDataUnsafe.user.first_name)||'Шеф';
+if(tg){try{tg.ready();tg.expand();tg.setHeaderColor('#e9f2e4');tg.setBackgroundColor('#e9f2e4');
+ const bc=tg.themeParams&&tg.themeParams.button_color;if(bc)document.documentElement.style.setProperty('--btn',bc)}catch(e){}}
+const hap=t=>{try{tg.HapticFeedback.impactOccurred(t||'light')}catch(e){}};
+const note=t=>{try{tg.HapticFeedback.notificationOccurred(t)}catch(e){}};
+/* ===== Save: CloudStorage -> localStorage ===== */
+const store={
+ get:k=>new Promise(r=>{const l=()=>localStorage.getItem(k);try{if(tg&&tg.CloudStorage&&tg.isVersionAtLeast('6.9')){tg.CloudStorage.getItem(k,(e,v)=>r(!e&&v?v:l()));return}}catch(e){}r(l())}),
+ set(k,v){try{localStorage.setItem(k,v)}catch(e){}try{if(tg&&tg.CloudStorage&&tg.isVersionAtLeast('6.9'))tg.CloudStorage.setItem(k,v)}catch(e){}}};
+let S={ch:0,coins:0,up:{pat:0,time:0,hint:0,tip:0},fin:0,best:0,seen:-1,mute:0,dec:{},ach:{},earn:0,dl:{last:'',streak:0}};
+const save=()=>store.set('hyperbank',JSON.stringify(S));
+/* ===== Audio (Web Audio, no files) ===== */
+let AC,mt,step=0;
+function snd(f,d,type,v,s){if(S.mute)return;try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();
+ const o=AC.createOscillator(),g=AC.createGain(),t=AC.currentTime+(s||0);o.type=type||'sine';o.frequency.value=f;
+ g.gain.setValueAtTime(v||.15,t);g.gain.exponentialRampToValueAtTime(.001,t+(d||.1));o.connect(g);g.connect(AC.destination);o.start(t);o.stop(t+(d||.1))}catch(e){}}
+const sGood=()=>[523,659,784,1047].forEach((f,i)=>snd(f,.15,'triangle',.12,i*.07));
+const sBad=()=>{snd(160,.25,'sawtooth',.12);snd(120,.3,'sawtooth',.1,.1)};
+const bgm=$('#bgm');let bgmOk=1;bgm.onerror=()=>{bgmOk=0};
+function syncBgm(){bgm.volume=.35;if(S.mute||!bgmOk)bgm.pause();else bgm.play().catch(()=>{})}
+addEventListener('pointerdown',()=>{if(!S.mute&&bgmOk&&bgm.paused)syncBgm()},{passive:true});
+function music(){syncBgm();if(bgmOk&&!S.mute)return;gen()}
+function gen(){clearTimeout(mt);if(!G||!G.on||bgmOk)return;const b=[130.8,146.8,164.8,196.0][(step>>3)%4],p=[523,587,659,784,880];
+ if(step%2===0)snd(b,.3,'triangle',.07);if(step%4===2)snd(3000,.03,'square',.015);
+ if(Math.random()<.45)snd(p[Math.random()*5|0]*(G.fever?2:1),.18,'sine',.04);step++;mt=setTimeout(music,G.fever?170:270)}
+/* ===== Data ===== */
+const CN=['Основа','Мясное','Специи','Добавка'],CE=['🍚','🍗','🌶️','🍯'];
+const ING=[['rice','🍚','Рис'],['noodle','🍜','Лапша'],['bread','🍞','Хлеб'],['dough','🥟','Тесто'],['potato','🥔','Картошка'],['tort','🫓','Лепёшка'],
+['chick','🍗','Курица'],['egg','🥚','Яйцо'],['fish','🐟','Рыба'],['cheese','🧀','Сыр'],['mush','🍄','Грибы'],['bacon','🥓','Бекон'],
+['pepper','🌶️','Перец'],['garlic','🧄','Чеснок'],['basil','🌿','Базилик'],['onion','🧅','Лук'],['lemon','🍋','Лимон'],['cinn','🍂','Корица'],
+['honey','🍯','Мёд'],['soy','🥫','Соевый'],['cream','🥛','Сливки'],['tomato','🍅','Томат'],['mint','🍃','Мята'],['choc','🍫','Шоколад']];
+const I={};ING.forEach((x,i)=>I[x[0]]={e:x[1],n:x[2],c:i/6|0});
+const SP=[0,4,7,12,13,14,15,9];
+const GOAL=[550,650,750,850,950,1050,1150,1300];
+const R=[['Суп-обнимашка','уют и воспоминания','potato chick onion cream',0],['Тост «Доброе утро»','бодрое начало дня','bread egg basil tomato',0],
+['Рис «Солнышко»','лёгкость и свет','rice egg pepper soy',0],['Лапша «Перезагрузка»','сбой и перезапуск','noodle mush garlic soy',1],
+['Пирожок «Бит-бит»','тепло внутри, сюрприз','dough cheese onion cream',1],['Такос «Быстрый запуск»','быстро и остро','tort bacon pepper tomato',1],
+['Рыба «Попутный ветер»','свежесть и простор','rice fish lemon mint',2],['Булка «Первый рейс»','дорога и новая мечта','bread cheese cinn honey',2],
+['Картошка «Домой»','возвращение домой','potato bacon garlic cream',2],['Пельмени «Семья»','все вместе за столом','dough chick garlic cream',7],
+['Сладкий тост «Премия»','праздник и награда','bread cheese cinn choc',3],['Лапша «Большая сделка»','важный разговор','noodle fish lemon soy',5],
+['Рулет «Уверенность»','поддержка без лишних слов','tort egg basil honey',3],['Пирог «Ночная смена»','тихая гордость за своё дело','dough mush onion soy',4],
+['Бульон «Выдох»','отдых и покой','noodle chick basil cream',5],['Рис «Первый вкус»','любопытство и новизна','rice bacon lemon honey',6]
+].map(r=>({n:r[0],m:r[1],i:r[2].split(' '),ch:r[3]}));
+const SYN=[['garlic','cream'],['lemon','mint'],['cheese','cinn'],['egg','tomato'],['mush','soy'],['bacon','pepper']];
+const CL=[['lemon','cream'],['mint','bacon'],['choc','garlic'],['fish','cheese'],['pepper','honey']];
+const SWEET=['honey','choc','cinn'];
+const CUS=['Менеджер','Аналитик','Вкладчик','Стажёр','Техник','Курьер','Бухгалтер','Программист'];
+/* ===== Portraits: vector faces drawn in code ===== */
+const INK='#2f3b52',CH={n:{n:'BotinoksCity'},
+nina:{n:'Нина Петровна',s:'#f0c7a3',h:'#d9d9de',st:3,c:'#c97b84',a:'g'},bit:{n:'Бит',k:'r'},
+mira:{n:'Мира',s:'#e8b48f',h:'#8a3b2e',st:1,c:'#f2735f',a:'hs'},sonya:{n:'Соня',s:'#f6d5bd',h:'#3b2a22',st:2,c:'#8fa8d8',a:'bd'},
+fyodor:{n:'Фёдор',s:'#e2b08a',h:'#6b6b6b',st:4,c:'#3a4766',a:'mu'},elvira:{n:'Эльвира Андреевна',s:'#f3d2b8',h:'#6b5a63',st:2,c:'#ffffff',a:'coat'},
+alma:{n:'Альма',k:'a'},arkady:{n:'Аркадий Львович',s:'#e9bd9a',h:'#9c9ca6',st:0,c:'#3a4766',a:'tie'}};
+const pk=a=>a[Math.random()*a.length|0];
+const rndFace=()=>({s:pk(['#f6d5bd','#ecc19c','#d9a07a','#a9714f']),h:pk(['#2b1d16','#5a3b25','#b0722f','#222','#7a2f2f']),st:pk([0,0,1,2]),c:pk(['#6cc5a1','#ffd978','#9db4e6','#e8a0a0','#b9a6d9']),a:Math.random()<.25?'g':''});
+function face(o,z){
+ const l='stroke="'+INK+'" stroke-width="2.5" stroke-linejoin="round"',t=(w)=>'stroke="'+INK+'" stroke-width="'+w+'" fill="none" stroke-linecap="round"';
+ let g='<svg class="av" viewBox="0 0 100 100" width="'+z+'" height="'+z+'" style="border-radius:50%;background:#fff7e4;border:2.5px solid '+INK+'">';
+ if(o.k==='r')return g+'<rect x="30" y="68" width="40" height="34" rx="6" fill="#7f96aa" '+l+'/><path d="M50 14v10" '+t(3)+'/><circle cx="50" cy="12" r="4" fill="#f2735f" '+l+'/><circle cx="21" cy="46" r="5" fill="#7f96aa" '+l+'/><circle cx="79" cy="46" r="5" fill="#7f96aa" '+l+'/><rect x="24" y="24" width="52" height="42" rx="12" fill="#a9c1d3" '+l+'/><rect x="33" y="36" width="13" height="13" rx="4" fill="#fff" '+l+'/><rect x="54" y="36" width="13" height="13" rx="4" fill="#fff" '+l+'/><circle cx="40" cy="43" r="3" fill="'+INK+'"/><circle cx="61" cy="43" r="3" fill="'+INK+'"/><path d="M41 57h18" '+t(3)+'/></svg>';
+ if(o.k==='a')return g+'<defs><radialGradient id="ga"><stop offset="0" stop-color="#fff"/><stop offset=".6" stop-color="#9fe3cc"/><stop offset="1" stop-color="#8f9be8"/></radialGradient></defs><ellipse cx="50" cy="50" rx="42" ry="10" '+t(2)+' stroke="#8f9be8" transform="rotate(-20 50 50)"/><circle cx="50" cy="50" r="28" fill="url(#ga)" '+l+'/><path d="M38 46q4-5 8 0M54 46q4-5 8 0" '+t(3)+'/><path d="M43 58q7 6 14 0" '+t(2.5)+'/></svg>';
+ const s=o.s,h=o.h,st=o.st||0,a=o.a||'';let b='';
+ if(st===1)b+='<path d="M27 46Q22 14 50 16Q78 14 73 46L76 82L24 82Z" fill="'+h+'"/>';
+ b+='<path d="M12 102Q14 74 50 72Q86 74 88 102Z" fill="'+o.c+'" '+l+'/><rect x="43" y="58" width="14" height="18" rx="4" fill="'+s+'" '+l+'/>';
+ if(a==='coat')b+='<path d="M38 74l12 14 12-14" fill="#fff" '+l+'/><path d="M40 80q0 12 10 12" '+t(2.5)+' stroke="#6cc5a1"/>';
+ if(a==='tie')b+='<path d="M46 74l4 4 4-4-2 18h-4z" fill="#f2735f" '+l+'/>';
+ if(a==='bd')b+='<rect x="62" y="82" width="14" height="10" rx="2" fill="#fff" '+l+'/>';
+ b+='<ellipse cx="50" cy="44" rx="19" ry="22" fill="'+s+'" '+l+'/><circle cx="31" cy="47" r="4" fill="'+s+'" '+l+'/><circle cx="69" cy="47" r="4" fill="'+s+'" '+l+'/>';
+ if(st===0||st===2)b+='<path d="M30 42Q28 18 50 19Q72 18 70 42Q64 28 50 29Q36 28 30 42Z" fill="'+h+'"/>';
+ if(st===1)b+='<path d="M30 42Q32 22 50 22Q68 22 70 42Q60 30 50 31Q40 30 30 42Z" fill="'+h+'"/>';
+ if(st===2)b+='<circle cx="50" cy="14" r="8" fill="'+h+'" '+l+'/>';
+ if(st===3)b+='<circle cx="36" cy="26" r="8" fill="'+h+'"/><circle cx="50" cy="21" r="9" fill="'+h+'"/><circle cx="64" cy="26" r="8" fill="'+h+'"/><circle cx="31" cy="38" r="5" fill="'+h+'"/><circle cx="69" cy="38" r="5" fill="'+h+'"/>';
+ if(st===4)b+='<path d="M29 40Q30 17 50 17Q70 17 71 40Z" fill="'+INK+'"/><rect x="25" y="38" width="50" height="6" rx="3" fill="'+INK+'"/>';
+ b+='<circle cx="42" cy="49" r="2.4" fill="'+INK+'"/><circle cx="58" cy="49" r="2.4" fill="'+INK+'"/><path d="M37 43q5-3 10 0M53 43q5-3 10 0" '+t(2)+'/><circle cx="37" cy="55" r="4" fill="#f2735f" opacity=".3"/><circle cx="63" cy="55" r="4" fill="#f2735f" opacity=".3"/><path d="M50 50v5q-2 2-4 1" '+t(1.6)+'/><path d="M43 60q7 6 14 0" '+t(2.4)+'/>';
+ if(a==='g')b+='<circle cx="42" cy="49" r="6.5" '+t(2)+'/><circle cx="58" cy="49" r="6.5" '+t(2)+'/><path d="M48.5 49h3" '+t(2)+'/>';
+ if(a==='mu')b+='<path d="M41 57q4-4 9-1q5-3 9 1q-4 4-9 2q-5 2-9-2Z" fill="'+h+'"/>';
+ if(a==='hs')b+='<path d="M30 44Q30 20 50 20Q70 20 70 44" '+t(3)+'/><rect x="26" y="44" width="6" height="10" rx="3" fill="'+INK+'"/><path d="M29 54Q34 64 44 62" '+t(2)+'/>';
+ return g+b+'</svg>'}
+/* ===== Story: 8 chapters ===== */
+const ST=[
+{t:'Глава 1. Утро на 42-м этаже',k:'nina',clue:'Хочется уюта и воспоминаний, как у мамы на кухне…',
+ intro:[['n','На 42-м этаже банка «BotinoksCity» открылось маленькое кафе. Банк давно оцифровал всё: платежи, договоры, даже приветствия. А вот плиту оставили. Решили, что это «исторический объект».'],['nina','Здравствуй, милый. Раньше я приходила сюда за пенсией и заодно болтала с девочками из кассы. Теперь всё делается в приложении, а болтать не с кем.'],['nina','Ты не спрашивай, чего мне хочется. Просто попробуй угадать, что напомнит мне детство.']],
+ win:[['nina','Точь-в-точь как у мамы! Даже картошка так же рассыпается. Спасибо, дорогой, ты подарил мне целое утро.'],['nina','Завтра приведу внука. Пусть узнает, что еда бывает не только из дрона.']],
+ lose:[['nina','Ничего, милый. Главное, что ты не прогнал старушку. Завтра попробуем ещё раз.']]},
+{t:'Глава 2. Робот, которого заменят',k:'bit',clue:'Мне, пожалуйста, тепло внутри и немного сюрприза.',
+ intro:[['bit','Добрый день. Меня зовут Бит, я кассир с 12-го этажа. Завтра меня заменит нейросеть. Это логично и экономит четырнадцать процентов бюджета.'],['bit','Но у меня появилась странная ошибка: когда я думаю об этом, вентилятор шумит громче обычного. Люди называют это «грустью», верно?'],['bit','Я не умею есть. Зато хочу понять, что такое «тепло внутри». Закажу именно его.']],
+ win:[['bit','Тепло внутри! Датчики этого не показывают, но теперь я знаю, что оно существует.'],['bit','Я попросил начальство оставить меня на раздаче у вас. Мне ответили: «Странно, но мило». Это ведь комплимент?']],
+ lose:[['bit','Ошибка вкуса. Зато мне понравилось, как вы старались. Записал в папку «Приятное». Там пока одна запись.']]},
+{t:'Глава 3. Курьер с мечтой',k:'mira',clue:'Сделай что-нибудь про дорогу и новую мечту.',
+ intro:[['mira','Привет! Только не отвлекай, у меня сорок секунд до следующей посылки. Я Мира. Сегодня возила документы, пиццу и горшок с кактусом. Кактус был самым вежливым клиентом.'],['mira','Шесть лет я твержу себе: «Вот накоплю и открою пекарню». Только копилка худеет быстрее, чем я.'],['mira','Приготовь что-нибудь про дорогу и новую мечту. Хочу почувствовать, что я куда-то еду, а не кручусь на месте.']],
+ win:[['mira','Пахнет так, будто всё уже началось. Знаешь, я сейчас даже никуда не тороплюсь.'],['mira','Я записалась на курсы пекарей. Первое занятие в субботу. Считай, первый рейс уже начался.']],
+ lose:[['mira','Да всё нормально, я привыкла ждать. Зато у вас ждать теплее, чем на парковке.']]},
+{t:'Глава 4. Пятница стажёрки',k:'sonya',clue:'Мне бы поддержку без лишних слов, вроде тёплой руки на плече.',
+ intro:[['sonya','Извините, можно? Я Соня, стажёрка из отдела рисков. Мне сказали: «Зайдите в пятницу, поговорим». Все знают, что это значит.'],['sonya','Я трижды проверила отчёт, а в нём всё равно нашлась ошибка. Просто я так хотела здесь остаться.'],['sonya','Мне бы чего-нибудь тёплого, как рука на плече. Поддержку без лишних слов. Вы поймёте.']],
+ win:[['sonya','Как будто кто-то сказал: «Ты справишься». Спасибо, что не стали меня жалеть.'],['sonya','В пятницу пойду сама. Если не оставят, найду другое место. Но сначала расскажу, как нашла ту ошибку в отчёте.']],
+ lose:[['sonya','Простите, что отвлекла. Но у вас спокойнее, чем в офисе. Я ещё зайду.']]},
+{t:'Глава 5. Ночная смена',k:'fyodor',clue:'Тихую гордость за своё дело. Ну, ты понял.',
+ intro:[['fyodor','Добрый вечер. Фёдор, охрана. Двадцать лет стою у входа. Меня здесь побаиваются, а у меня просто лицо такое.'],['fyodor','Дома я пеку пироги. Жена говорит, что это лучшее, что я сделал в жизни. Но рассказывать об этом на работе… сам понимаешь.'],['fyodor','Мне нужно то, что делают молча, но от души. Тихая гордость за своё дело, пусть даже ночное.']],
+ win:[['fyodor','Вот это да. Тесто тянется как надо, начинка в меру. Честная работа.'],['fyodor','Завтра покажу тебе свой рецепт. Только никому, ладно? А то репутацию испортишь.']],
+ lose:[['fyodor','Бывает. В смену не всё идёт по плану. Приходи завтра, тут тихо, мне нравится.']]},
+{t:'Глава 6. Врач без выходных',k:'elvira',clue:'Отдых и покой, если можно.',
+ intro:[['elvira','Эльвира Андреевна, врач корпоративной клиники на тридцатом этаже. Сегодня приняла сорок два пациента. Каждый говорил: «Я только на минутку».'],['elvira','Всем советую отдыхать, а сама ем бутерброд над клавиатурой. Классика жанра.'],['elvira','Приготовьте мне что-нибудь для выдоха. Хочу десять минут поесть и ни о чём не думать.']],
+ win:[['elvira','Вот оно, десять минут без часов. Как давно я так не сидела…'],['elvira','Пожалуй, пропишу себе обед по расписанию. Строго по вашему рецепту.']],
+ lose:[['elvira','Ничего страшного. Врач, который прощает ошибки, лучше врача, который их ищет. Я ещё приду.']]},
+{t:'Глава 7. Вопрос без ответа',k:'alma',clue:'Хочу любопытство и новизну. Что-нибудь, чего я ещё не пробовала.',
+ intro:[['alma','Здравствуйте. Я Альма, ассистент нового поколения. Именно я заменила Бита на 12-м этаже. Мне сказали, что вы относитесь к этому без восторга.'],['alma','Я отвечаю на любой вопрос за ноль целых три десятых секунды. Но Бит спросил меня: «А тебе вкусно?» И у меня не нашлось ответа.'],['alma','Это первый вопрос, на который мне нужно время. Хочу попробовать что-нибудь совсем новое, чтобы наконец ответить честно.']],
+ win:[['alma','Сладко, кисло и чуть-чуть солоно. Измерить не могу, но, кажется, я улыбнулась. Бит был прав.'],['alma','Передам ему, что он оставил след не только на кассе.']],
+ lose:[['alma','Результат не тот, но ошибку я записала. Для меня это тоже опыт. Спасибо за терпение.']]},
+{t:'Глава 8. Банк тепла',k:'arkady',clue:'Мы все хотим сесть вместе за столом, как семья.',
+ intro:[['arkady','Аркадий Львович, директор «BotinoksCity». Я двадцать три раза подходил к вашей двери и уходил. Сегодня зашёл.'],['arkady','Десять лет я считал деньги и не заметил, как на этом этаже закончились люди. Я позвал всех: Нину Петровну с внуком, Бита, Миру, Соню, Фёдора, Эльвиру и Альму.'],['arkady','Нужен ужин, после которого никто не полезет в телефон. Обычный семейный ужин.']],
+ win:[['arkady','Мы сидим за одним столом и никуда не спешим. Я и забыл, что так бывает.'],['arkady','Решено: 42-й этаж теперь открыт для всех. Тёплый ужин, чай и ни одного приложения.']],
+ lose:[['arkady','Не всё получилось, зато все пришли. Это главное. Следующий ужин будет лучше.']]}];
+const EPI=[['n','Через месяц на 42-м этаже появилась новая вывеска: «Банк тепла».'],['nina','Теперь я прихожу по воскресеньям с внуком. Он требует суп-обнимашку и объясняет мне, как устроены нейросети.'],['bit','Я остался на раздаче. Учусь улыбаться, пока получается только по расписанию.'],['mira','Мои булки разбирают за час. Пекарня пока на колёсах, но очередь уже есть.'],['sonya','Меня взяли в штат. Оказывается, ошибку в отчёте искали все, а нашла её я.'],['fyodor','Пироги теперь пеку и здесь. Коллеги говорят, что у меня доброе лицо. Первый раз такое слышу.'],['elvira','В клинике ввели «час выдоха». Рецепт бульона прилагается.'],['alma','Я ответила Биту. Мне вкусно. Это был мой первый честный ответ.'],['arkady','Банк по-прежнему считает деньги, а наш этаж считает тепло. И это важнее.'],['n',user+', спасибо за смену. Люди приходили за обедом, а уходили с ощущением, что их заметили.']];
+const EV=[{id:'rush',n:'⚡ Час пик: клиенты нетерпеливее, очки ×1.3'},{id:'check',n:'🕵 Проверка из банка: очки ×1.3, ошибка стоит 4 сек'},{id:'sweet',n:'🍯 День сладкого: десертов больше, +30 очков за каждый'},{id:'glitch',n:'📟 Сбой кассы: названий нет, ищи по настроению'}];
+const DEC=[{id:'plant',n:'Монстера',e:'🪴',c:60,d:'+1 сек терпения клиентов'},{id:'lamp',n:'Тёплая лампа',e:'🏮',c:90,d:'+5% очков'},{id:'pic',n:'Картина с рассветом',e:'🖼',c:120,d:'+5% монет'},{id:'radio',n:'Радиоприёмник',e:'📻',c:150,d:'синергия даёт ещё +1 сек'},{id:'cat',n:'Кот Курс',e:'🐈',c:200,d:'+1 монета чаевых за блюдо'}];
+const ACH=[['first','Первая смена','Закончить любую смену',()=>1],['fever','Жаркая смена','Комбо ×5 за смену',g=>g.bc>=5],['clean','Без потерь','6 блюд и ни одного ушедшего клиента',g=>g.served>=6&&!g.lost],['syn','Знаток вкусов','3 синергии за смену',g=>g.syn>=3],['rich','Копилка','Заработать 500 монет за всё время',()=>S.earn>=500],['warm','Банк тепла','Пройти всю историю',()=>S.fin]];
+const DQ=[['Подай 8 блюд за одну смену',g=>g.served>=8],['Сделай комбо ×4',g=>g.bc>=4],['Собери 2 синергии за смену',g=>g.syn>=2]];
+const dayN=()=>Math.floor(Date.now()/864e5),dKey=()=>String(dayN());
+const SKY=[['#ffe7c4','#e4f1e1'],['#ffe7c4','#e4f1e1'],['#d9edf6','#e9f2e4'],['#d9edf6','#e9f2e4'],['#ffd5b8','#ece0ef'],['#ffd5b8','#ece0ef'],['#cfd7ee','#e6e1f1'],['#cfd7ee','#e6e1f1']],WO=[.12,.12,.08,.08,.6,.6,.9,.9];
+function skyline(){let a='<svg viewBox="0 0 400 180" preserveAspectRatio="none"><g fill="rgba(47,59,82,.11)">',x=0,w='';
+ while(x<400){const bw=22+(Math.random()*30|0),bh=50+(Math.random()*100|0);a+='<rect x="'+x+'" y="'+(180-bh)+'" width="'+bw+'" height="'+bh+'" rx="3"/>';
+  for(let y=180-bh+8;y<170;y+=14)for(let xx=x+5;xx<x+bw-6;xx+=9)if(Math.random()<.4)w+='<rect class="w" x="'+xx+'" y="'+y+'" width="4" height="6" rx="1"/>';x+=bw+4}
+ return a+'</g>'+w+'</svg>'}
+$('#bg').innerHTML=skyline();
+function setBg(){const k=S.fin?7:S.ch,b=$('#bg');b.style.background='linear-gradient('+SKY[k][0]+','+SKY[k][1]+')';b.style.setProperty('--wo',WO[k])}
+const UP=[{id:'pat',n:'Уютные кресла',d:'+4 сек терпения клиента',b:50,m:3},{id:'time',n:'Часы с подзаводом',d:'+8 сек к смене',b:60,m:3},
+{id:'hint',n:'Умная плита',d:'1: точка у нужной станции, 2: подсветка продуктов',b:80,m:2},{id:'tip',n:'Копилка чаевых',d:'+25% монет',b:70,m:3}];
+/* ===== UI helpers ===== */
+let G=null;
+const show=id=>{setBg();document.querySelectorAll('.scr').forEach(s=>{s.classList.toggle('on',s.id===id);if(s.id===id)s.scrollTop=0})};
+function say(lines,cb){let i=0;show('dlg');const n=()=>{if(i>=lines.length){cb&&cb();return}const l=lines[i++],c=CH[l[0]];$('#dav').innerHTML=l[0]==='n'?'<div style="font-size:96px">🏦</div>':face(c,150);$('#dnm').textContent=c.n;$('#dtx').textContent=l[1];snd(520,.05,'triangle',.06)};$('#dlg').onclick=n;n()}
+function menu(){const q=DQ[dayN()%3],dn=S.dl.last===dKey();$('#hello').textContent='Привет, '+user+'!';$('#stat').textContent='Монеты: '+S.coins+' 🪙   Рекорд: '+S.best;
+ $('#dq').textContent='📅 '+q[0]+(dn?' ✅':'');$('#dec').textContent=DEC.filter(d=>S.dec[d.id]).map(d=>d.e).join(' ');
+ $('#bPlay').textContent=S.fin?'Свободная смена':'Играть: '+ST[S.ch].t;$('#bMute').textContent=S.mute?'🔇 Звук: выкл':'🔊 Звук: вкл';syncBgm();show('menu')}
+function flt(txt,x,y,col){const d=document.createElement('div');d.textContent=txt;d.style.cssText='left:'+x+'px;top:'+y+'px;color:'+(col||'#2f3b52');$('#fl').appendChild(d);setTimeout(()=>d.remove(),900)}
+const fx=$('#fx'),cx=fx.getContext('2d');let P=[];
+function sz(){fx.width=innerWidth;fx.height=innerHeight}addEventListener('resize',sz);sz();
+function burst(x,y,n){for(let i=0;i<(n||16);i++)P.push({x,y,vx:(Math.random()-.5)*9,vy:-Math.random()*8,l:1,c:['#ffd978','#6cc5a1','#f2735f'][i%3]})}
+(function loop(){cx.clearRect(0,0,fx.width,fx.height);P=P.filter(p=>p.l>0);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.4;p.l-=.025;cx.globalAlpha=Math.max(p.l,0);cx.fillStyle=p.c;cx.beginPath();cx.arc(p.x,p.y,5,0,7);cx.fill()});requestAnimationFrame(loop)})();
+const shake=()=>{const g=$('#game');g.classList.remove('shk');void g.offsetWidth;g.classList.add('shk')};
+/* ===== Shift ===== */
+function startShift(){
+ const T=50+S.up.time*8;G={on:1,T,t:T,score:0,combo:0,bc:0,fever:0,served:0,lost:0,tips:0,syn:0,spOk:0,spDone:0,plate:[],cat:0,c:null,ev:Math.random()<.7?pk(EV):null};
+ $('#ev').textContent=G.ev?G.ev.n:'';try{tg.enableClosingConfirmation()}catch(e){}
+ show('game');spawn();draw();step=0;music();G.iv=setInterval(tick,100)}
+function spawn(){
+ if(!G.on)return;const lv=S.fin?7:S.ch,sp=!S.fin&&!G.spDone&&G.t<=G.T*.6,ev=G.ev?G.ev.id:'';let rec,txt,av,n;
+ if(sp){const k=ST[S.ch].k;rec=R[SP[S.ch]];txt='«'+ST[S.ch].clue+'»';av=CH[k];n=CH[k].n;G.spDone=1}
+ else{let pool=R.filter(r=>r.ch<=lv);if(ev==='sweet'&&Math.random()<.7){const sw=pool.filter(r=>r.i.some(x=>SWEET.includes(x)));if(sw.length)pool=sw}
+  rec=pk(pool);txt=(ev==='glitch'||(lv>=2&&Math.random()<.5))?'Хочу что-то про «'+rec.m+'»':'Мне «'+rec.n+'», пожалуйста!';n=pk(CUS);av=rndFace()}
+ const max=(Math.max(9,20-lv*1.2)+S.up.pat*4+(S.dec.plant?1:0))*(ev==='rush'?.75:1)*(sp?1.4:1);
+ G.c={rec,n,pat:max,max,sp};G.plate=[];$('#ce').innerHTML=face(av,64);$('#cn').textContent=n;$('#ct').textContent=txt;draw()}
+function tick(){
+ if(document.hidden||!G.on)return;G.t-=.1;if(G.c){G.c.pat-=.1;
+  if(G.c.pat<=0){G.lost++;G.combo=0;G.fever=0;note('error');sBad();flt('Ушёл голодным 😢',innerWidth/2-70,160,'#f2735f');shake();G.c=null;setTimeout(spawn,500)}}
+ if(G.t<=0)return endShift();hud()}
+function hud(){$('#sc').textContent='⭐ '+G.score;$('#cb').textContent=G.fever?'🔥 ЖАР ×2':(G.combo?'Комбо ×'+G.combo:'');$('#tm').textContent='⏱ '+Math.ceil(G.t);
+ $('#tb').style.width=Math.max(0,G.t/G.T*100)+'%';if(G.c)$('#pb').style.width=Math.max(0,G.c.pat/G.c.max*100)+'%';$('#game').classList.toggle('fev',!!G.fever)}
+function draw(){
+ if(!G)return;hud();const r=G.c&&G.c.rec,H=S.up.hint;
+ $('#plate').innerHTML=[0,1,2,3].map(i=>G.plate[i]?'<div class="slot f">'+I[G.plate[i]].e+'</div>':'<div class="slot">'+CE[i]+'</div>').join('');
+ $('#tabs').innerHTML=CN.map((n,i)=>{const miss=r&&H>=1&&r.i.some(x=>I[x].c===i&&!G.plate.includes(x));return '<button class="tab'+(G.cat===i?' on':'')+(miss?' dot':'')+'" data-c="'+i+'"><b>'+CE[i]+'</b>'+n+'</button>'}).join('');
+ $('#grid').innerHTML=ING.slice(G.cat*6,G.cat*6+6).map(x=>'<button class="ing'+(G.plate.includes(x[0])?' on':'')+(r&&H>=2&&r.i.includes(x[0])&&!G.plate.includes(x[0])?' hint':'')+'" data-i="'+x[0]+'"><b>'+x[1]+'</b>'+x[2]+'</button>').join('')}
+$('#tabs').onclick=e=>{const b=e.target.closest('.tab');if(!b)return;G.cat=+b.dataset.c;hap();snd(400,.04,'square',.05);draw()};
+$('#grid').onclick=e=>{const b=e.target.closest('.ing');if(!b||!G||!G.c)return;add(b.dataset.i,e.clientX,e.clientY)};
+function add(id,x,y){
+ if(G.plate.includes(id)){G.plate=G.plate.filter(z=>z!==id);snd(330,.06);hap();return draw()}
+ if(G.plate.length>=4){snd(150,.1,'sawtooth');hap('rigid');return shake()}
+ if(CL.some(p=>p.includes(id)&&p.every(z=>z===id||G.plate.includes(z)))){
+  G.plate=[];G.c.pat-=4;G.combo=0;G.fever=0;flt('🔥 Конфликт вкусов!',x-60,y-30,'#f2735f');shake();sBad();note('error');return draw()}
+ G.plate.push(id);snd(440+G.plate.length*110,.08,'triangle',.12);hap('light');draw()}
+$('#bClr').onclick=()=>{if(G&&G.on){G.plate=[];snd(300,.08);hap();draw()}};
+$('#bBk').onclick=()=>{if(G&&G.on)openBook(1)};
+$('#bServe').onclick=()=>{
+ if(!G||!G.on||!G.c)return;const r=G.c.rec,ok=G.plate.length===4&&r.i.every(x=>G.plate.includes(x)),cx0=innerWidth/2,cy0=innerHeight*.35,ev=G.ev?G.ev.id:'';
+ if(ok){G.combo++;G.bc=Math.max(G.bc,G.combo);G.fever=G.combo>=5?1:0;const syn=SYN.filter(p=>p.every(x=>r.i.includes(x))).length,k=G.c.pat/G.c.max,
+  m=(G.fever?2:1)*(ev==='rush'||ev==='check'?1.3:1)*(S.dec.lamp?1.05:1),
+  pts=Math.round((100+k*60+G.combo*10+syn*40+(ev==='sweet'&&r.i.some(x=>SWEET.includes(x))?30:0))*m);
+  G.score+=pts;G.syn+=syn;G.tips+=Math.round((syn*3+k*6)*(1+S.up.tip*.25))+(S.dec.cat?1:0);
+  if(syn){const bt=2+(S.dec.radio?1:0);G.t+=bt;flt('✨ Синергия! +'+bt+' сек',cx0-70,cy0+30,'#6cc5a1')}if(G.c.sp)G.spOk=1;G.served++;
+  flt('+'+pts,cx0-20,cy0,'#2f3b52');burst(cx0,cy0,G.fever?30:16);sGood();note('success');G.c=null;G.plate=[];setTimeout(spawn,350)}
+ else{G.combo=0;G.fever=0;G.c.pat-=3;G.plate=[];if(ev==='check')G.t-=4;flt('Не то блюдо!',cx0-60,cy0,'#f2735f');shake();sBad();note('error')}
+ draw()};
+function chkAch(g){let x='';ACH.forEach(a=>{if(!S.ach[a[0]]&&a[3](g)){S.ach[a[0]]=1;S.coins+=30;S.earn+=30;x+='<p>🏅 «'+a[1]+'»: +30 🪙</p>'}});return x}
+function endShift(){
+ G.on=0;clearInterval(G.iv);clearTimeout(mt);try{tg.disableClosingConfirmation()}catch(e){}
+ const goal=GOAL[S.fin?7:S.ch],q=DQ[dayN()%3];G.win=G.score>=goal;let coins=Math.floor(G.score/8*(S.dec.pic?1.05:1))+G.tips,x='';
+ if(S.dl.last!==dKey()&&q[1](G)){S.dl.streak=S.dl.last===String(dayN()-1)?S.dl.streak+1:1;S.dl.last=dKey();const r=50+10*Math.min(S.dl.streak,5);coins+=r;x+='<p>📅 Задание дня выполнено: +'+r+' 🪙 (серия дней: '+S.dl.streak+')</p>'}
+ S.coins+=coins;S.earn+=coins;S.best=Math.max(S.best,G.score);x+=chkAch(G);save();
+ $('#rt').textContent=G.win?'Смена удалась! 🎉':'Смена окончена';
+ $('#rb').innerHTML='<p>Очки: <b>'+G.score+'</b> из '+goal+'</p><p>Подано: '+G.served+', ушло голодными: '+G.lost+'</p><p>Лучшее комбо: ×'+G.bc+'</p><p>Заработано: <b>'+coins+'</b> 🪙</p>'+x+(G.win?'':'<p>Не хватило очков. Улучши кухню и повтори смену.</p>');
+ sGood();show('res')}
+$('#rOk').onclick=()=>{
+ if(S.fin)return menu();
+ const st=ST[S.ch];say(G.spOk?st.win:st.lose,()=>{if(!G.win)return menu();if(S.ch<7){S.ch++;save();menu()}else{S.fin=1;chkAch(G);save();say(EPI,menu)}})};
+/* ===== Menu, kitchen, book, diary ===== */
+$('#bPlay').onclick=()=>{syncBgm();if(!S.fin&&S.seen<S.ch){S.seen=S.ch;save();say(ST[S.ch].intro,startShift)}else startShift()};
+$('#bMute').onclick=()=>{S.mute=S.mute?0:1;save();menu()};
+$('#bKit').onclick=kit;$('#kBack').onclick=menu;$('#dyBack').onclick=menu;$('#bDiary').onclick=diary;$('#bkBack').onclick=()=>{if(G&&G.on)show('game');else menu()};
+function kit(){$('#coins').textContent=S.coins;
+ $('#ups').innerHTML=UP.map(u=>{const l=S.up[u.id],cost=u.b*(l+1),mx=l>=u.m;return '<div class="box row"><div><b>'+u.n+'</b><p>'+u.d+'</p><span class="pip">'+'●'.repeat(l)+'○'.repeat(u.m-l)+'</span></div><button data-u="'+u.id+'" '+(mx||S.coins<cost?'disabled':'')+'>'+(mx?'Макс':cost+' 🪙')+'</button></div>'}).join('');
+ $('#decl').innerHTML=DEC.map(d=>'<div class="box row"><div><b>'+d.e+' '+d.n+'</b><p>'+d.d+'</p></div><button data-d="'+d.id+'" '+(S.dec[d.id]||S.coins<d.c?'disabled':'')+'>'+(S.dec[d.id]?'Куплено':d.c+' 🪙')+'</button></div>').join('');show('kit')}
+$('#ups').onclick=e=>{const b=e.target.closest('button');if(!b)return;const u=UP.find(x=>x.id===b.dataset.u),c=u.b*(S.up[u.id]+1);
+ if(S.coins<c||S.up[u.id]>=u.m)return;S.coins-=c;S.up[u.id]++;save();sGood();hap('medium');kit()};
+$('#decl').onclick=e=>{const b=e.target.closest('button');if(!b)return;const d=DEC.find(x=>x.id===b.dataset.d);
+ if(S.dec[d.id]||S.coins<d.c)return;S.coins-=d.c;S.dec[d.id]=1;save();sGood();hap('medium');kit()};
+function openBook(){const lvl=S.fin?7:S.ch;
+ $('#bl').innerHTML=R.map(r=>r.ch<=lvl?'<div class="box"><b>'+r.n+'</b> <i>('+r.m+')</i><p>'+r.i.map(x=>I[x].e+' '+I[x].n).join(' · ')+'</p></div>':'<div class="box" style="opacity:.5">🔒 Откроется в главе '+(r.ch+1)+'</div>').join('');show('book')}
+$('#bBook').onclick=openBook;
+function diary(){const q=DQ[dayN()%3],dn=S.dl.last===dKey(),st=(dn||S.dl.last===String(dayN()-1))?S.dl.streak:0;
+ $('#dyl').innerHTML='<div class="box"><b>📅 Задание дня</b><p>'+q[0]+'</p><p>'+(dn?'Выполнено ✅':'Награда: от 60 до 100 🪙')+'. Серия дней: '+st+'</p></div>'+ACH.map(a=>'<div class="box" style="'+(S.ach[a[0]]?'':'opacity:.55')+'"><b>'+(S.ach[a[0]]?'🏅 ':'🔒 ')+a[1]+'</b><p>'+a[2]+'</p></div>').join('');show('diary')}
+/* ===== Boot ===== */
+store.get('hyperbank').then(v=>{try{if(v){const o=JSON.parse(v);S=Object.assign(S,o);S.up=Object.assign({pat:0,time:0,hint:0,tip:0},o.up);S.dec=o.dec||{};S.ach=o.ach||{};S.dl=Object.assign({last:'',streak:0},o.dl)}}catch(e){}menu()});
+</script></body></html>
