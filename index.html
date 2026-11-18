@@ -1,0 +1,1786 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Tropic Merge — Merge & Build</title>
+<script type="text/javascript" src="https://me.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=99fzRdT7qGAvFZ6RIgwyA5p_npleX3aeXBcyk7z4ekq-qP2SSt5rCwW0fCTIpvHVJaquZv0whVkUj5NmdLS1WEt3AMtHmAPoLBN1pYNPUkT3OcRizzd_faUIOj3X8urhxERZrReBx7hQqS3293ho6Z5G2o-HFkptjFVs8JwhjtaH_2vB7BtADJXUPbFvAl2QGWrPgmuEzEKMatfbVAhCir0xY4ZMnDJ7qrHmgpf0W_QaBTkV0H2L5h5Gc8n8RDb37EiCqL31TQKUrqewp3qfoxkKkh6gLJ7fWLwgsX9D-94RDHF6o7TEIHSyyfvn0hCQ" charset="UTF-8"></script><script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ocean:#3cc4bd;
+  --ocean-deep:#269fa3;
+  --sand:#f7e8c8;
+  --sand-dark:#e6cf9f;
+  --grass:#7bd876;
+  --grass-dark:#58b959;
+  --card:#ffffff;
+  --ink:#263849;
+  --muted:#677b8c;
+  --gold:#ffb82e;
+  --coral:#ff6f61;
+  --energy:#29b6f6;
+  --shadow:0 4px 0 rgba(38,56,73,.14);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+html,body{margin:0;height:100%;overflow:hidden;overscroll-behavior:none;background:var(--ocean)}
+body{
+  height:100dvh;
+  font-family:'Nunito',system-ui,-apple-system,sans-serif;
+  color:var(--ink);
+  display:flex;
+  flex-direction:column;
+  background:linear-gradient(180deg,#5ce1d6 0%,#3cc4bd 42%,#f5e6c4 43%,#ebd5a7 100%);
+}
+
+/* ===== TOP WIDGETS ===== */
+#hud{
+  padding:calc(var(--top-safe, 86px) + 4px) 10px 6px;
+  display:grid;
+  grid-template-columns:1.25fr 1fr 1fr auto;
+  gap:6px;
+  z-index:10;
+}
+.pill{
+  background:rgba(255,255,255,.94);
+  border-radius:14px;
+  padding:5px 9px;
+  box-shadow:var(--shadow);
+  display:flex;
+  align-items:center;
+  gap:6px;
+  min-width:0;
+}
+.pill-ic{font-size:18px;flex:none}
+.pill-col{display:flex;flex-direction:column;min-width:0;line-height:1.1}
+.pill-val{font-weight:900;font-size:14px;white-space:nowrap}
+.pill-sub{font-weight:700;font-size:10px;color:var(--muted);white-space:nowrap}
+.pill-btn{
+  background:#fff;
+  border:none;
+  border-radius:14px;
+  padding:0 10px;
+  font-size:18px;
+  box-shadow:var(--shadow);
+  cursor:pointer;
+}
+.pill-btn:active{transform:translateY(2px);box-shadow:0 2px 0 rgba(38,56,73,.14)}
+
+/* ===== ISLAND DIORAMA (TOP SCENE) ===== */
+#island-wrap{
+  position:relative;
+  margin:0 10px;
+  height:24dvh;
+  min-height:146px;
+  max-height:220px;
+  border-radius:22px;
+  overflow:hidden;
+  background:radial-gradient(circle at 50% 35%,#79ece2 0%,#39c2bc 68%,#26a3a6 100%);
+  box-shadow:0 6px 16px rgba(24,78,84,.22),inset 0 2px 0 rgba(255,255,255,.45);
+  flex:none;
+}
+#island-svg{width:100%;height:100%;display:block}
+.stage-badge{
+  position:absolute;
+  top:6px;left:8px;
+  background:rgba(255,255,255,.88);
+  padding:2px 7px;
+  border-radius:9px;
+  font-size:10px;
+  font-weight:800;
+  box-shadow:0 2px 5px rgba(0,0,0,.1);
+  display:flex;align-items:center;gap:3px;
+  pointer-events:none;
+  z-index:2;
+}
+.build-cta{
+  position:absolute;
+  bottom:8px;right:10px;
+  z-index:3;
+  background:linear-gradient(180deg,#ffd24c,#ffad1f);
+  color:#3c2500;
+  border:2px solid #fff;
+  border-radius:14px;
+  padding:6px 12px;
+  font-family:inherit;
+  font-weight:900;
+  font-size:12px;
+  box-shadow:0 4px 10px rgba(0,0,0,.18);
+  cursor:pointer;
+  display:flex;align-items:center;gap:5px;
+}
+.build-cta.pulse{animation:pulseBtn 1.5s infinite}
+@keyframes pulseBtn{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+
+/* SVG Island Animations */
+@keyframes wavePulse{0%,100%{transform:scale(1);opacity:.55}50%{transform:scale(1.035);opacity:.85}}
+@keyframes sway{0%,100%{transform:rotate(-2.5deg)}50%{transform:rotate(2.5deg)}}
+@keyframes spinSlow{to{transform:rotate(360deg)}}
+@keyframes floatBoat{0%,100%{transform:translateY(0px)}50%{transform:translateY(-3px)}}
+@keyframes smokeRise{0%{transform:translate(0,0) scale(.6);opacity:.7}100%{transform:translate(6px,-18px) scale(1.4);opacity:0}}
+@keyframes gullFly{0%{transform:translateX(-30px) translateY(0)}50%{transform:translateX(180px) translateY(-8px)}100%{transform:translateX(410px) translateY(2px)}}
+@keyframes popBuild{0%{transform:scale(0) translateY(15px);opacity:0}70%{transform:scale(1.12) translateY(-3px);opacity:1}100%{transform:scale(1) translateY(0);opacity:1}}
+.wave-ring{transform-origin:200px 115px;animation:wavePulse 3.6s ease-in-out infinite}
+.palm{transform-box:fill-box;transform-origin:bottom center;animation:sway 4s ease-in-out infinite}
+.mill-blades{transform-box:fill-box;transform-origin:center;animation:spinSlow 9s linear infinite}
+.boat-bob{animation:floatBoat 2.8s ease-in-out infinite}
+.smoke{animation:smokeRise 2.4s ease-out infinite}
+.gull{animation:gullFly 16s linear infinite}
+.bld-pop{transform-box:fill-box;transform-origin:bottom center;animation:popBuild .55s cubic-bezier(.22,1.25,.36,1) forwards}
+
+/* ===== ORDERS STRIP ===== */
+#orders{
+  display:flex;
+  gap:8px;
+  padding:6px 10px 4px;
+  overflow-x:auto;
+  flex:none;
+  scrollbar-width:none;
+}
+#orders::-webkit-scrollbar{display:none}
+.ord{
+  background:var(--card);
+  border-radius:16px;
+  padding:6px 10px;
+  box-shadow:var(--shadow);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex:none;
+  border:2px solid transparent;
+  transition:.15s;
+}
+.ord.ready{border-color:#4cd964;background:#f2fff4}
+.ord-items{display:flex;gap:4px}
+.ord-it{
+  position:relative;
+  width:38px;height:38px;
+  border-radius:10px;
+  background:#f4efe4;
+  display:grid;place-items:center;
+  cursor:pointer;
+  transition:transform .12s;
+}
+.ord-it:active{transform:scale(.92)}
+.ord-it::before{
+  content:'?';
+  position:absolute;top:1px;left:3px;
+  font-size:8px;font-weight:900;color:rgba(38,56,73,.42);
+}
+.ord-it.has::before{display:none}
+.chain-row{
+  display:flex;align-items:center;gap:4px;overflow-x:auto;padding:4px 0;
+}
+.chain-step{
+  flex:none;width:44px;border-radius:10px;background:#f7f2e7;
+  padding:3px 2px;display:flex;flex-direction:column;align-items:center;
+  font-size:8px;font-weight:800;text-align:center;border:1.5px solid transparent;
+}
+.chain-step.target{background:#fef3c7;border-color:#ffb82e}
+.chain-step.owned{background:#dcfce7;border-color:#22c55e}
+.ord-it.has{background:#dcfce7;box-shadow:inset 0 0 0 2px #4cd964}
+.ord-it .chk{
+  position:absolute;bottom:-3px;right:-3px;
+  background:#22c55e;color:#fff;
+  width:14px;height:14px;border-radius:50%;
+  font-size:9px;font-weight:900;display:grid;place-items:center;
+}
+.ord-go{
+  background:#22c55e;color:#fff;
+  border:none;border-radius:11px;
+  padding:6px 10px;
+  font-family:inherit;font-weight:900;font-size:12px;
+  cursor:pointer;
+  box-shadow:0 3px 0 #15803d;
+}
+.ord-go:disabled{background:#cbd5e1;box-shadow:none;color:#64748b;cursor:default}
+.ord-more{
+  background:#f1f5f9;color:var(--ink);
+  border:1.5px solid #cbd5e1;border-radius:11px;
+  padding:6px 8px;
+  font-family:inherit;font-weight:900;font-size:13px;letter-spacing:1px;line-height:1;
+  cursor:pointer;
+  box-shadow:0 2px 0 rgba(38,56,73,.12);
+}
+.ord-more:active{transform:translateY(2px);box-shadow:none}
+.ord-rew{font-size:11px;font-weight:800;color:var(--muted);line-height:1.15}
+
+/* ===== MERGE BOARD (5x6) ===== */
+#board-area{
+  flex:1;
+  padding:2px 10px 4px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  min-height:0;
+}
+#board{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  grid-template-rows:repeat(5,1fr);
+  gap:5px;
+  width:100%;
+  height:100%;
+  max-height:340px;
+  background:rgba(255,255,255,.38);
+  padding:6px;
+  border-radius:20px;
+  box-shadow:inset 0 2px 6px rgba(133,106,58,.18);
+}
+.cell{
+  position:relative;
+  border-radius:13px;
+  background:#fdf6e7;
+  box-shadow:0 2px 0 rgba(168,140,86,.35);
+  display:grid;
+  place-items:center;
+  transition:transform .12s,background .15s;
+}
+.cell.alt{background:#f5ebd4}
+.cell.sel{
+  background:#fff3bf;
+  box-shadow:0 0 0 3px var(--gold),0 4px 8px rgba(0,0,0,.15);
+  transform:scale(1.05);
+  z-index:3;
+}
+.cell.match{
+  box-shadow:0 0 0 2.5px #4cd964;
+  background:#ebffef;
+}
+.cell.locked{
+  background:#dfd3bc;
+  box-shadow:inset 0 2px 5px rgba(85,68,42,.25);
+}
+.cell.locked::after{
+  content:'';
+  position:absolute;inset:0;
+  border-radius:13px;
+  background:repeating-linear-gradient(45deg,rgba(255,255,255,.35) 0 4px,transparent 4px 9px);
+  pointer-events:none;
+}
+.cell.locked .item-svg{opacity:.58;filter:sepia(.35)}
+.lvl-dot{
+  position:absolute;
+  top:2px;left:4px;
+  font-size:9px;font-weight:900;
+  color:rgba(38,56,73,.55);
+  pointer-events:none;
+}
+.gen-ring{
+  position:absolute;
+  bottom:2px;right:3px;
+  font-size:10px;
+  background:var(--energy);
+  color:#fff;
+  border-radius:6px;
+  padding:0 3px;
+  font-weight:900;
+  pointer-events:none;
+}
+.need-dot{
+  position:absolute;
+  top:2px;right:3px;
+  width:8px;height:8px;
+  border-radius:50%;
+  background:#22c55e;
+  border:1.5px solid #fff;
+  pointer-events:none;
+}
+.item-svg{width:76%;height:76%;pointer-events:none;transition:transform .15s}
+.merge-anim{animation:mergePop .28s cubic-bezier(.2,1.4,.4,1)}
+@keyframes mergePop{0%{transform:scale(.4)}70%{transform:scale(1.18)}100%{transform:scale(1)}}
+
+/* ===== INFO BAR ABOVE NAV ===== */
+#sel-bar{
+  margin:0 10px 4px;
+  background:rgba(255,255,255,.92);
+  border-radius:14px;
+  padding:5px 10px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  min-height:36px;
+  font-size:12px;
+  box-shadow:0 2px 0 rgba(38,56,73,.1);
+}
+#sel-bar button{
+  border:none;border-radius:10px;
+  padding:4px 9px;
+  font-family:inherit;font-weight:800;font-size:11px;
+  cursor:pointer;
+}
+.btn-sell{background:#fee2e2;color:#b91c1c}
+.btn-bag{background:#e0f2fe;color:#0369a1}
+.btn-use{background:#dcfce7;color:#15803d}
+
+/* ===== BOTTOM CONTROL MENU ===== */
+#nav{
+  background:#ffffff;
+  padding:6px 10px max(8px,env(safe-area-inset-bottom));
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:6px;
+  border-radius:22px 22px 0 0;
+  box-shadow:0 -4px 16px rgba(38,56,73,.12);
+  z-index:10;
+}
+.nav-btn{
+  background:#f4f7f9;
+  border:none;
+  border-radius:14px;
+  padding:6px 4px;
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  font-family:inherit;font-weight:800;font-size:11px;color:var(--ink);
+  cursor:pointer;
+  position:relative;
+}
+.nav-btn *{pointer-events:none}
+.nav-btn span.ic{font-size:19px;line-height:1}
+.nav-btn.on{background:#dff7f4;color:#0f766e;box-shadow:inset 0 0 0 2px #3cc4bd}
+.badge{
+  position:absolute;top:3px;right:10px;
+  background:var(--coral);color:#fff;
+  font-size:9px;font-weight:900;
+  padding:1px 5px;border-radius:99px;
+}
+
+/* ===== DRAWER / MODAL ===== */
+#modal{
+  display:none;
+  position:fixed;inset:0;
+  background:rgba(22,38,52,.45);
+  backdrop-filter:blur(2px);
+  z-index:30;
+  align-items:flex-end;
+}
+#modal.on{display:flex}
+.sheet{
+  width:100%;
+  max-height:78dvh;
+  background:#fffdf8;
+  border-radius:26px 26px 0 0;
+  padding:14px 14px max(16px,env(safe-area-inset-bottom));
+  display:flex;flex-direction:column;gap:10px;
+  box-shadow:0 -8px 24px rgba(0,0,0,.2);
+  animation:slideUp .22s ease-out;
+}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+.sheet-head{display:flex;justify-content:space-between;align-items:center}
+.sheet-head h2{margin:0;font-size:19px}
+.back-btn{background:#f1f5f9;color:var(--ink);border:2px solid #e2e8f0;border-radius:12px;padding:6px 14px;font-family:inherit;font-size:13px;font-weight:800;line-height:1.1;box-shadow:0 2px 0 rgba(38,56,73,.12);cursor:pointer;flex:none}
+.back-btn:active{transform:translateY(2px);box-shadow:none}
+.sheet-body{overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-right:2px}
+.card-row{
+  background:#fff;
+  border:2px solid #efe6d5;
+  border-radius:16px;
+  padding:10px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.card-row.done{background:#f3faf4;border-color:#bbf7d0}
+.act-btn{
+  background:linear-gradient(180deg,#4ade80,#22c55e);
+  color:#fff;border:none;border-radius:12px;
+  padding:8px 12px;font-family:inherit;font-weight:900;font-size:12px;
+  box-shadow:0 3px 0 #15803d;cursor:pointer;white-space:nowrap;
+}
+.act-btn:disabled{background:#cbd5e1;box-shadow:none;color:#64748b;cursor:default}
+
+/* Backpack & Atlas Grids */
+.bag-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.bag-slot{
+  aspect-ratio:1;border-radius:16px;
+  background:#f6efe0;border:2px dashed #d4c3a1;
+  display:grid;place-items:center;position:relative;cursor:pointer;
+}
+.bag-slot.filled{border-style:solid;background:#fff;border-color:#3cc4bd}
+.atlas-chain{background:#fff;border:2px solid #efe6d5;border-radius:16px;padding:8px}
+.atlas-items{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:6px}
+.atlas-cell{
+  aspect-ratio:1;border-radius:10px;background:#f7f2e7;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-size:9px;font-weight:800;text-align:center;padding:2px;
+}
+.atlas-cell.unk{opacity:.4}
+
+/* Floating feedback & drag ghost */
+#fl{position:fixed;inset:0;pointer-events:none;z-index:40}
+#fl div{
+  position:fixed;font-weight:900;font-size:16px;
+  pointer-events:none;animation:fltUp .85s forwards;
+  text-shadow:0 2px 0 #fff,0 -1px 0 #fff;z-index:40;
+}
+@keyframes fltUp{to{transform:translateY(-54px);opacity:0}}
+#ghost{
+  position:fixed;width:54px;height:54px;pointer-events:none;
+  z-index:50;transform:translate(-50%,-50%) scale(1.15);display:none;
+}
+
+/* ===== GUIDE TUTORIAL ===== */
+#tut-box{
+  display:none;
+  margin:2px 10px 4px;
+  background:linear-gradient(180deg,#fffef9,#fff6df);
+  border:2px solid #ffb82e;
+  border-radius:16px;
+  padding:7px 10px;
+  box-shadow:0 4px 12px rgba(38,56,73,.16);
+  align-items:center;
+  gap:9px;
+  z-index:25;
+  flex:none;
+}
+#tut-box.on{display:flex}
+.tut-ava{
+  width:38px;height:38px;border-radius:12px;
+  background:#dff7f4;border:1.5px solid #3cc4bd;
+  display:grid;place-items:center;flex:none;
+}
+.tut-mid{flex:1;min-width:0;line-height:1.25}
+.tut-top{display:flex;align-items:center;gap:6px;margin-bottom:2px}
+.tut-tag{font-size:10px;font-weight:900;color:#b45309;background:#fef3c7;padding:1px 6px;border-radius:6px}
+.tut-msg{font-size:12px;font-weight:700;color:var(--ink)}
+.tut-skip{
+  background:#f1f5f9;color:var(--muted);border:none;border-radius:10px;
+  padding:5px 8px;font-family:inherit;font-weight:800;font-size:11px;
+  cursor:pointer;flex:none;
+}
+.tut-pulse{
+  box-shadow:0 0 0 3px #ffb82e,0 0 14px rgba(255,184,46,.75) !important;
+  animation:tutGlow 1.15s ease-in-out infinite;
+  z-index:4;
+}
+@keyframes tutGlow{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+body.tut-active .tut-dim{opacity:.42;pointer-events:none !important}
+body.tut-active #orders.tut-dim .ord-more{pointer-events:auto !important;opacity:1 !important}
+
+</style>
+</head>
+<body>
+
+<!-- TOP WIDGETS -->
+<header id="hud">
+  <div class="pill">
+    <span class="pill-ic">⚡</span>
+    <div class="pill-col">
+      <span class="pill-val" id="h-en">50/50</span>
+      <span class="pill-sub" id="h-ent">Полная</span>
+    </div>
+  </div>
+  <div class="pill">
+    <span class="pill-ic">🪙</span>
+    <div class="pill-col">
+      <span class="pill-val" id="h-coin">0</span>
+      <span class="pill-sub">Монеты</span>
+    </div>
+  </div>
+  <div class="pill">
+    <span class="pill-ic">⭐</span>
+    <div class="pill-col">
+      <span class="pill-val" id="h-star">0</span>
+      <span class="pill-sub" id="h-stg">Этап 1/5</span>
+    </div>
+  </div>
+  <button class="pill-btn" id="btn-mute" title="Музыка">🔊</button>
+</header>
+
+<!-- ISLAND DIORAMA -->
+<section id="island-wrap">
+  <div class="stage-badge" id="stage-lbl">🏝 Песчаная отмель</div>
+  <svg id="island-svg" viewBox="48 24 304 162" preserveAspectRatio="xMidYMid slice"></svg>
+  <button class="build-cta" id="btn-build">🔨 Строить <span id="build-cnt"></span></button>
+</section>
+
+<!-- ORDERS STRIP -->
+<section id="orders"></section>
+
+<!-- GUIDE VILLAGER TUTORIAL -->
+<section id="tut-box">
+  <div class="tut-ava">
+    <svg width="28" height="32" viewBox="-12 -20 24 26">
+      <ellipse cx="0" cy="3" rx="6" ry="2.2" fill="rgba(0,0,0,.15)"/>
+      <rect x="-4.5" y="-9" width="9" height="12" rx="4.2" fill="#ff7043"/>
+      <circle cx="0" cy="-14" r="4.6" fill="#ffe0b2"/>
+    </svg>
+  </div>
+  <div class="tut-mid">
+    <div class="tut-top"><span class="tut-tag" id="tut-step">Обучение 1/5</span><b style="font-size:11px;color:#0f766e">Островитянин</b></div>
+    <div class="tut-msg" id="tut-msg">Нажми на Лесную рощу ⚡, чтобы добыть ресурс!</div>
+  </div>
+  <button class="tut-skip" id="tut-skip">Пропустить</button>
+</section>
+
+<!-- MERGE BOARD -->
+<main id="board-area">
+  <div id="board"></div>
+</main>
+
+<!-- SELECTED ITEM ACTION BAR -->
+<div id="sel-bar">
+  <span id="sel-txt" style="color:var(--muted);font-weight:700">Нажми на рощу ⚡ или перетащи 2 одинаковых предмета</span>
+  <div id="sel-acts" style="display:flex;gap:5px"></div>
+</div>
+
+<!-- BOTTOM CONTROL MENU -->
+<nav id="nav">
+  <button class="nav-btn on" data-tab="board"><span class="ic">🧩</span>Поле</button>
+  <button class="nav-btn" data-tab="build"><span class="ic">🏗</span>Стройка<span class="badge" id="bdg-build" style="display:none">!</span></button>
+  <button class="nav-btn" data-tab="bag"><span class="ic">🎒</span>Склад<span class="badge" id="bdg-bag">0/4</span></button>
+  <button class="nav-btn" data-tab="atlas"><span class="ic">📖</span>Атлас</button>
+</nav>
+
+<!-- MODAL SHEET -->
+<div id="modal">
+  <div class="sheet">
+    <div class="sheet-head">
+      <h2 id="m-title">Заголовок</h2>
+      <button class="back-btn" id="m-close">Назад</button>
+    </div>
+    <div class="sheet-body" id="m-body"></div>
+  </div>
+</div>
+
+<div id="ghost"></div>
+<div id="fl"></div>
+<!-- Положи свой файл music.mp3 рядом с index.html, и он заиграет автоматически -->
+<audio id="bgm" src="music.mp3" loop preload="auto"></audio>
+
+<script>
+'use strict';
+const tg = window.Telegram && Telegram.WebApp;
+const $ = s => document.querySelector(s);
+function applySafeArea() {
+  let top = 0;
+  try {
+    const sTop = (tg && tg.safeAreaInset && tg.safeAreaInset.top) || 0;
+    const cTop = (tg && tg.contentSafeAreaInset && tg.contentSafeAreaInset.top) || 0;
+    top = sTop + cTop;
+  } catch (e) {}
+  const inTg = !!(tg && tg.platform && tg.platform !== 'unknown');
+  const finalTop = Math.max(top, inTg ? 86 : 10);
+  document.documentElement.style.setProperty('--top-safe', finalTop + 'px');
+}
+applySafeArea();
+if (tg) {
+  try {
+    tg.ready(); tg.expand();
+    tg.setHeaderColor('#5ce1d6');
+    tg.setBackgroundColor('#ebd5a7');
+    applySafeArea();
+    tg.onEvent('safeAreaChanged', applySafeArea);
+    tg.onEvent('contentSafeAreaChanged', applySafeArea);
+    tg.onEvent('viewportChanged', applySafeArea);
+  } catch (e) {}
+}
+const hap = t => { try { tg.HapticFeedback.impactOccurred(t || 'light'); } catch (e) {} };
+const note = t => { try { tg.HapticFeedback.notificationOccurred(t); } catch (e) {} };
+
+/* ===== STORAGE ===== */
+const SAVE_KEY = 'sun_island_v1';
+const store = {
+  get: k => new Promise(r => {
+    const loc = () => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+    let done = false;
+    const finish = val => { if (!done) { done = true; r(val); } };
+    setTimeout(() => finish(loc()), 500);
+    try {
+      if (tg && tg.CloudStorage && tg.isVersionAtLeast('6.9')) {
+        tg.CloudStorage.getItem(k, (e, v) => finish(!e && v ? v : loc()));
+        return;
+      }
+    } catch (e) {}
+    finish(loc());
+  }),
+  set(k, v) {
+    try { localStorage.setItem(k, v); } catch (e) {}
+    try { if (tg && tg.CloudStorage && tg.isVersionAtLeast('6.9')) tg.CloudStorage.setItem(k, v); } catch (e) {}
+  }
+};
+
+/* ===== AUDIO (Custom music.mp3 + Cozy Procedural Kalimba Fallback) ===== */
+const bgm = $('#bgm');
+let bgmReady = true, customBlobUrl = null, AC = null, musicTimer = null, noteStep = 0;
+bgm.onerror = () => { bgmReady = false; };
+
+function tone(freq, dur, type, vol, delay) {
+  if (S.mute) return;
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    if (AC.state === 'suspended') AC.resume();
+    const o = AC.createOscillator(), g = AC.createGain(), t = AC.currentTime + (delay || 0);
+    o.type = type || 'sine';
+    o.frequency.value = freq;
+    g.gain.setValueAtTime(vol || 0.1, t);
+    g.gain.exponentialRampToValueAtTime(0.0008, t + (dur || 0.14));
+    o.connect(g); g.connect(AC.destination);
+    o.start(t); o.stop(t + (dur || 0.14));
+  } catch (e) {}
+}
+const sfxTap = () => tone(520, 0.06, 'sine', 0.08);
+const sSpawn = () => { tone(440, 0.07, 'triangle', 0.09); tone(660, 0.09, 'triangle', 0.08, 0.04); };
+const sMerge = lvl => {
+  const base = 392 * Math.pow(1.08, lvl);
+  tone(base, 0.12, 'triangle', 0.12);
+  tone(base * 1.25, 0.16, 'triangle', 0.11, 0.06);
+};
+const sOrder = () => [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(f, 0.18, 'triangle', 0.11, i * 0.07));
+const sBuild = () => [392, 493.88, 587.33, 783.99, 987.77].forEach((f, i) => tone(f, 0.24, 'sine', 0.13, i * 0.08));
+
+function startProceduralMusic() {
+  clearTimeout(musicTimer);
+  if (S.mute || (bgmReady && !bgm.paused)) return;
+  const scale = [523.25, 587.33, 659.25, 783.99, 880, 1046.5];
+  const bass = [130.81, 174.61, 196.00, 164.81];
+  if (noteStep % 4 === 0) tone(bass[(noteStep >> 2) % 4], 0.55, 'sine', 0.045);
+  if (Math.random() < 0.65) {
+    const f = scale[(noteStep * 3 + (Math.random() * 3 | 0)) % scale.length];
+    tone(f, 0.28, 'sine', 0.032);
+  }
+  noteStep++;
+  musicTimer = setTimeout(startProceduralMusic, 420);
+}
+
+function syncAudio() {
+  bgm.volume = 0.4;
+  $('#btn-mute').textContent = S.mute ? '🔇' : '🔊';
+  if (S.mute) {
+    bgm.pause();
+    clearTimeout(musicTimer);
+    return;
+  }
+  if (bgmReady) {
+    bgm.play().then(() => clearTimeout(musicTimer)).catch(() => startProceduralMusic());
+  } else {
+    startProceduralMusic();
+  }
+}
+document.addEventListener('click', () => { if (!S.mute && bgm.paused) syncAudio(); }, { passive: true });
+
+/* ===== GAME DATA: CHAINS, ITEMS, BUILDINGS, STAGES ===== */
+const CHAINS = {
+  wood: {
+    name: 'Дерево',
+    items: ['Ветка', 'Бревно', 'Доски', 'Брус', 'Сруб', 'Резной фасад', 'Башня']
+  },
+  stone: {
+    name: 'Камень и Руда',
+    items: ['Галька', 'Булыжник', 'Блок', 'Кирпичи', 'Руда', 'Слиток', 'Механизм']
+  },
+  food: {
+    name: 'Урожай и Еда',
+    items: ['Росток', 'Колос', 'Сноп', 'Мука', 'Тесто', 'Хлеб', 'Пир']
+  },
+  tool: {
+    name: 'Ремесло',
+    items: ['Кремень', 'Топор', 'Пила', 'Молоток', 'Наковальня', 'Компас']
+  },
+  coin: {
+    name: 'Сокровища',
+    items: ['Медяк', 'Серебро', 'Золото', 'Сундук']
+  }
+};
+
+const GENS = {
+  g_wood: { name: 'Лесная роща', chain: 'wood', sub: 'tool', subChance: 0.18 },
+  g_stone: { name: 'Каменный карьер', chain: 'stone', sub: 'tool', subChance: 0.20 },
+  g_food: { name: 'Плодородная грядка', chain: 'food', sub: 'coin', subChance: 0.12 }
+};
+
+/* Vector SVG icons for every item & generator */
+function itemSVG(key, lvl) {
+  const s = '<svg class="item-svg" viewBox="0 0 64 64">';
+  if (key === 'g_wood') return s + '<ellipse cx="32" cy="52" rx="22" ry="7" fill="#58b959"/><circle cx="24" cy="30" r="14" fill="#43a047"/><circle cx="40" cy="32" r="12" fill="#66bb6a"/><circle cx="32" cy="21" r="13" fill="#81c784"/><rect x="29" y="38" width="6" height="14" rx="2" fill="#795548"/></svg>';
+  if (key === 'g_stone') return s + '<ellipse cx="32" cy="53" rx="23" ry="6" fill="#90a4ae"/><polygon points="12,50 22,22 36,18 52,50" fill="#78909c"/><polygon points="24,50 35,24 49,50" fill="#90a4ae"/><polygon points="28,28 34,22 39,29" fill="#eceff1"/></svg>';
+  if (key === 'g_food') return s + '<rect x="10" y="34" width="44" height="18" rx="6" fill="#8d6e63"/><rect x="14" y="37" width="36" height="10" rx="4" fill="#5d4037"/><path d="M22 37c0-10-6-14-6-14s8 0 8 10M32 37c0-13 0-18 0-18s6 4 2 14M42 37c0-10 6-14 6-14s-8 0-8 10" stroke="#7cb342" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg>';
+
+  if (key === 'wood') {
+    const shapes = [
+      '<path d="M16 46L48 18M34 30L44 34M26 38L22 28" stroke="#8d6e63" stroke-width="6" stroke-linecap="round"/>',
+      '<rect x="14" y="24" width="36" height="16" rx="7" fill="#8d6e63"/><circle cx="46" cy="32" r="7" fill="#d7ccc8"/>',
+      '<rect x="12" y="20" width="40" height="9" rx="3" fill="#bcaaa4"/><rect x="14" y="33" width="38" height="9" rx="3" fill="#a1887f"/>',
+      '<path d="M14 42h36v8H14zM18 32h28v8H18zM24 22h16v8H24z" fill="#8d6e63" stroke="#5d4037" stroke-width="2"/>',
+      '<rect x="16" y="26" width="32" height="24" rx="3" fill="#a1887f"/><polygon points="12,28 32,12 52,28" fill="#ff7043"/><rect x="28" y="36" width="8" height="14" fill="#5d4037"/>',
+      '<rect x="14" y="22" width="36" height="28" rx="4" fill="#ffe0b2" stroke="#8d6e63" stroke-width="3"/><polygon points="10,24 32,9 54,24" fill="#ef5350"/><circle cx="32" cy="18" r="3" fill="#ffd54f"/>',
+      '<rect x="20" y="18" width="24" height="34" rx="3" fill="#d7ccc8" stroke="#6d4c41" stroke-width="2.5"/><polygon points="16,20 32,6 48,20" fill="#ffb300"/><rect x="28" y="26" width="8" height="10" rx="4" fill="#29b6f6"/>'
+    ];
+    return s + (shapes[lvl] || shapes[0]) + '</svg>';
+  }
+  if (key === 'stone') {
+    const shapes = [
+      '<ellipse cx="32" cy="36" rx="14" ry="10" fill="#b0bec5"/>',
+      '<polygon points="16,44 20,24 38,20 48,34 42,46" fill="#90a4ae"/>',
+      '<rect x="16" y="20" width="32" height="26" rx="5" fill="#78909c"/><path d="M16 32h32M32 20v26" stroke="#cfd8dc" stroke-width="2"/>',
+      '<rect x="12" y="34" width="18" height="10" rx="2" fill="#e57373"/><rect x="34" y="34" width="18" height="10" rx="2" fill="#ef5350"/><rect x="22" y="22" width="20" height="10" rx="2" fill="#ff8a65"/>',
+      '<polygon points="16,46 24,18 42,20 48,46" fill="#546e7a"/><circle cx="29" cy="31" r="4" fill="#ffd54f"/><circle cx="38" cy="37" r="3" fill="#4fc3f7"/>',
+      '<polygon points="14,42 22,24 44,24 50,42" fill="#cfd8dc" stroke="#78909c" stroke-width="2"/><polygon points="22,24 44,24 40,31 25,31" fill="#fff"/>',
+      '<circle cx="32" cy="32" r="15" fill="none" stroke="#ffb300" stroke-width="7" stroke-dasharray="7 4"/><circle cx="32" cy="32" r="7" fill="#546e7a"/>'
+    ];
+    return s + (shapes[lvl] || shapes[0]) + '</svg>';
+  }
+  if (key === 'food') {
+    const shapes = [
+      '<path d="M32 48V28M32 34c-8-6-12-2-12-2s4 6 12 2M32 30c8-6 12-2 12-2s-4 6-12 2" stroke="#66bb6a" stroke-width="4" fill="none" stroke-linecap="round"/>',
+      '<path d="M26 48L38 16" stroke="#fbc02d" stroke-width="4" stroke-linecap="round"/><ellipse cx="34" cy="24" rx="4" ry="7" fill="#fdd835"/><ellipse cx="30" cy="33" rx="4" ry="7" fill="#fbc02d"/>',
+      '<rect x="20" y="18" width="24" height="30" rx="10" fill="#fdd835"/><rect x="18" y="31" width="28" height="5" rx="2" fill="#e65100"/>',
+      '<path d="M18 22h28l4 26H14z" fill="#fff8e1" stroke="#d7ccc8" stroke-width="2"/><circle cx="32" cy="36" r="6" fill="#ffe082"/>',
+      '<ellipse cx="32" cy="36" rx="17" ry="12" fill="#ffe0b2" stroke="#ffb74d" stroke-width="2"/>',
+      '<ellipse cx="32" cy="35" rx="19" ry="13" fill="#d9822b"/><path d="M23 28l4 8M31 27l4 8M39 29l3 7" stroke="#ffe0b2" stroke-width="2.5" stroke-linecap="round"/>',
+      '<ellipse cx="32" cy="44" rx="22" ry="7" fill="#eceff1"/><ellipse cx="32" cy="35" rx="15" ry="10" fill="#ff7043"/><circle cx="24" cy="38" r="4" fill="#66bb6a"/><circle cx="40" cy="38" r="4" fill="#ffd54f"/>'
+    ];
+    return s + (shapes[lvl] || shapes[0]) + '</svg>';
+  }
+  if (key === 'tool') {
+    const shapes = [
+      '<polygon points="22,44 30,18 44,38" fill="#78909c"/>',
+      '<rect x="30" y="16" width="5" height="34" rx="2" fill="#8d6e63"/><polygon points="20,18 36,16 36,28 20,25" fill="#90a4ae"/>',
+      '<polygon points="14,38 46,20 50,27 18,45" fill="#b0bec5"/><rect x="12" y="36" width="10" height="12" rx="3" fill="#ff7043"/>',
+      '<rect x="30" y="22" width="5" height="28" rx="2" fill="#8d6e63"/><rect x="18" y="16" width="28" height="11" rx="3" fill="#546e7a"/>',
+      '<path d="M14 26h36l-6 10h6v10H14V36h6z" fill="#455a64"/>',
+      '<circle cx="32" cy="32" r="18" fill="#ffd54f" stroke="#f57f17" stroke-width="3"/><circle cx="32" cy="32" r="12" fill="#fff"/><polygon points="32,21 36,32 32,43 28,32" fill="#ef5350"/>'
+    ];
+    return s + (shapes[lvl] || shapes[0]) + '</svg>';
+  }
+  // coin
+  const shapes = [
+    '<circle cx="32" cy="32" r="13" fill="#d97706" stroke="#92400e" stroke-width="2.5"/>',
+    '<circle cx="32" cy="32" r="15" fill="#e2e8f0" stroke="#64748b" stroke-width="2.5"/><circle cx="32" cy="32" r="9" fill="none" stroke="#94a3b8" stroke-width="2"/>',
+    '<circle cx="32" cy="32" r="17" fill="#fbbf24" stroke="#d97706" stroke-width="3"/><text x="32" y="38" text-anchor="middle" font-size="18" font-weight="900" fill="#92400e">★</text>',
+    '<rect x="14" y="24" width="36" height="24" rx="5" fill="#b45309" stroke="#78350f" stroke-width="2.5"/><path d="M14 31h36" stroke="#fbbf24" stroke-width="4"/><rect x="28" y="28" width="8" height="9" rx="2" fill="#fde047"/>'
+  ];
+  return s + (shapes[lvl] || shapes[0]) + '</svg>';
+}
+
+/* 5 Island Stages & 15 Buildings with coordinates on the SVG diorama */
+const STAGES = [
+  { name: 'Песчаная отмель', blds: ['fire', 'tent', 'bridge'] },
+  { name: 'Бухта рыбака', blds: ['pier', 'hut', 'boat'] },
+  { name: 'Каменный утёс', blds: ['quarry_b', 'forge', 'lighthouse'] },
+  { name: 'Ветреное плато', blds: ['field', 'mill', 'bakery'] },
+  { name: 'Солнечный порт', blds: ['workshop', 'market', 'hall'] }
+];
+
+const BUILDINGS = [
+  { id: 'fire', st: 0, name: 'Костёр путешественника', desc: '+1 житель на острове', stars: 2, coins: 25, x: 165, y: 128 },
+  { id: 'tent', st: 0, name: 'Уютный шалаш', desc: 'Макс. энергия +3 ⚡', stars: 3, coins: 45, x: 125, y: 112, enCap: 3 },
+  { id: 'bridge', st: 0, name: 'Деревянный мостик', desc: 'Открывает Бухту рыбака', stars: 4, coins: 75, x: 225, y: 132 },
+
+  { id: 'pier', st: 1, name: 'Рыбацкий причал', desc: '+1 житель и лодка у берега', stars: 5, coins: 110, x: 280, y: 148 },
+  { id: 'hut', st: 1, name: 'Хижина у воды', desc: 'Макс. энергия +3 ⚡', stars: 6, coins: 150, x: 252, y: 116, enCap: 3 },
+  { id: 'boat', st: 1, name: 'Парусный баркас', desc: 'Открывает Каменный утёс', stars: 8, coins: 210, x: 325, y: 158 },
+
+  { id: 'quarry_b', st: 2, name: 'Склад камня', desc: 'Дарит Каменный карьер на поле!', stars: 9, coins: 260, x: 145, y: 82, grantGen: 'g_stone' },
+  { id: 'forge', st: 2, name: 'Дымная кузница', desc: '+1 житель-кузнец', stars: 11, coins: 330, x: 188, y: 76 },
+  { id: 'lighthouse', st: 2, name: 'Белый маяк', desc: 'Открывает Ветреное плато', stars: 14, coins: 420, x: 92, y: 88 },
+
+  { id: 'field', st: 3, name: 'Золотые грядки', desc: 'Дарит Плодородную грядку!', stars: 15, coins: 480, x: 238, y: 84, grantGen: 'g_food' },
+  { id: 'mill', st: 3, name: 'Ветряная мельница', desc: 'Макс. энергия +4 ⚡', stars: 18, coins: 580, x: 285, y: 86, enCap: 4 },
+  { id: 'bakery', st: 3, name: 'Тёплая пекарня', desc: 'Открывает Солнечный порт', stars: 22, coins: 700, x: 212, y: 102 },
+
+  { id: 'workshop', st: 4, name: 'Мастерская изобретателя', desc: '+1 житель-мастер', stars: 25, coins: 850, x: 162, y: 102 },
+  { id: 'market', st: 4, name: 'Торговый ряд', desc: '+15% монет за заказы', stars: 30, coins: 1050, x: 268, y: 132 },
+  { id: 'hall', st: 4, name: 'Солнечная ратуша', desc: 'Макс. энергия +5 ⚡ и финал главы!', stars: 36, coins: 1350, x: 200, y: 64, enCap: 5 }
+];
+
+/* ===== STATE ===== */
+let S = {
+  en: 50,
+  enTs: Date.now(),
+  coins: 60,
+  stars: 0,
+  stage: 0,
+  built: {},
+  genLvl: { g_wood: 1, g_stone: 1, g_food: 1 },
+  board: [], // 30 cells: null | { t:'gen'|'item', k:string, l:number, lock?:bool }
+  bag: [],
+  orders: [],
+  seen: { wood: [1, 0, 0, 0, 0, 0, 0], stone: [0, 0, 0, 0, 0, 0, 0], food: [0, 0, 0, 0, 0, 0, 0], tool: [0, 0, 0, 0, 0, 0], coin: [0, 0, 0, 0] },
+  mute: 0,
+  lastPop: '',
+  tut: 0
+};
+const save = () => store.set(SAVE_KEY, JSON.stringify(S));
+
+function maxEn() {
+  let m = 50;
+  BUILDINGS.forEach(b => { if (S.built[b.id] && b.enCap) m += b.enCap; });
+  return m;
+}
+
+function regenEnergy() {
+  const cap = maxEn();
+  const now = Date.now();
+  if (S.en >= cap) { S.enTs = now; return; }
+  const stepMs = 30000; // 1 energy per 30 sec
+  const gained = Math.floor((now - S.enTs) / stepMs);
+  if (gained > 0) {
+    S.en = Math.min(cap, S.en + gained);
+    S.enTs += gained * stepMs;
+    if (S.en >= cap) S.enTs = now;
+  }
+}
+
+function initNewBoard() {
+  const b = Array(30).fill(null);
+  // Starting generator
+  b[14] = { t: 'gen', k: 'g_wood', l: 1 };
+  // Free starter items
+  b[8] = { t: 'item', k: 'wood', l: 0 };
+  b[13] = { t: 'item', k: 'wood', l: 0 };
+  b[15] = { t: 'item', k: 'wood', l: 1 };
+  // Locked cobweb/sand cells with pre-placed items to unlock by merging!
+  const locks = [
+    [0, 'wood', 2], [1, 'wood', 1], [4, 'tool', 0], [5, 'coin', 0],
+    [6, 'wood', 1], [11, 'tool', 1], [18, 'stone', 1], [23, 'coin', 1],
+    [24, 'stone', 2], [25, 'food', 1], [28, 'food', 2], [29, 'coin', 2]
+  ];
+  locks.forEach(([idx, k, l]) => { b[idx] = { t: 'item', k, l, lock: true }; });
+  S.board = b;
+  S.orders = [{ id: 'ord_tut', reqs: [{ k: 'wood', l: 2 }], stars: 2, coins: 30 }];
+  refillOrders();
+}
+
+/* ===== ORDERS GENERATOR ===== */
+function makeOrder() {
+  const st = S.stage;
+  const availChains = ['wood'];
+  if (S.built.quarry_b || st >= 2) availChains.push('stone');
+  if (S.built.field || st >= 3) availChains.push('food');
+  if (st >= 1) availChains.push('tool');
+
+  const maxTier = Math.min(5, 2 + st);
+  const count = st === 0 ? 1 : (Math.random() < 0.55 ? 2 : 1);
+  const reqs = [];
+  for (let i = 0; i < count; i++) {
+    const ch = availChains[Math.random() * availChains.length | 0];
+    const capL = Math.min(CHAINS[ch].items.length - 2, maxTier);
+    const l = Math.max(1, Math.min(capL, 1 + (Math.random() * (st + 2) | 0)));
+    reqs.push({ k: ch, l });
+  }
+  const value = reqs.reduce((a, r) => a + Math.round(Math.pow(2.15, r.l) * 8), 0);
+  const stars = Math.max(1, Math.round(value / 24));
+  const coins = Math.max(12, Math.round(value * (S.built.market ? 1.15 : 1)));
+  return { id: Math.random().toString(36).slice(2, 8), reqs, stars, coins };
+}
+
+function refillOrders() {
+  while (S.orders.length < 3) S.orders.push(makeOrder());
+}
+
+/* ===== ISLAND DIORAMA & WALKING FACELESS VILLAGERS ===== */
+const VILLAGERS = [
+  { x: 170, y: 128, tx: 140, ty: 118, col: '#ff7043', spd: 0.28, wait: 0 },
+  { x: 195, y: 122, tx: 220, ty: 130, col: '#42a5f5', spd: 0.24, wait: 40 }
+];
+const EXTRA_VILLAGER_COLS = ['#ab47bc', '#26a69a', '#ffa726', '#ec407a'];
+
+function syncVillagerCount() {
+  let target = 2;
+  if (S.built.fire) target++;
+  if (S.built.pier) target++;
+  if (S.built.forge) target++;
+  if (S.built.workshop) target++;
+  while (VILLAGERS.length < target) {
+    const col = EXTRA_VILLAGER_COLS[(VILLAGERS.length - 2) % EXTRA_VILLAGER_COLS.length];
+    VILLAGERS.push({ x: 190, y: 115, tx: 160, ty: 120, col, spd: 0.22 + Math.random() * 0.1, wait: 20 });
+  }
+}
+
+function getWalkTargets() {
+  const pts = [{ x: 175, y: 132 }, { x: 205, y: 124 }, { x: 155, y: 118 }];
+  BUILDINGS.forEach(b => {
+    if (S.built[b.id] && b.id !== 'boat') pts.push({ x: b.x, y: b.y + 8 });
+  });
+  return pts;
+}
+
+function renderIsland() {
+  syncVillagerCount();
+  const b = S.built;
+  const pop = id => (S.lastPop === id ? ' bld-pop' : '');
+  let svg = `
+    <defs>
+      <radialGradient id="lagoon" cx="50%" cy="55%" r="52%">
+        <stop offset="0%" stop-color="#8cf5ec" stop-opacity=".75"/>
+        <stop offset="100%" stop-color="#3cc4bd" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <!-- Lagoon glow & animated foam rings -->
+    <ellipse cx="200" cy="118" rx="165" ry="74" fill="url(#lagoon)"/>
+    <ellipse class="wave-ring" cx="200" cy="118" rx="146" ry="62" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-dasharray="18 12"/>
+    <ellipse class="wave-ring" style="animation-delay:-1.8s" cx="200" cy="118" rx="134" ry="54" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-dasharray="10 14"/>
+
+    <!-- Sand Beach -->
+    <path d="M74,118 C72,78 135,54 205,56 C278,58 332,84 328,122 C324,158 265,172 198,170 C128,168 76,154 74,118 Z" fill="#f7e8c8" stroke="#e4cfa3" stroke-width="3"/>
+    <!-- Lush Green Turf -->
+    <path d="M92,114 C90,82 144,62 204,64 C266,66 310,88 306,118 C302,146 254,156 198,154 C140,152 94,142 92,114 Z" fill="#7bd876"/>
+    <!-- Highland Plateau -->
+    <ellipse cx="195" cy="92" rx="82" ry="26" fill="#68c765"/>
+    <!-- Sandy Footpaths -->
+    <path d="M128,116 Q168,132 202,122 T276,144 M150,86 Q192,102 242,88" fill="none" stroke="#f3dfb6" stroke-width="6" stroke-linecap="round"/>
+
+    <!-- Decorative Palms -->
+    <g class="palm"><path d="M108,126 Q104,108 109,94" stroke="#8d6e63" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M109,94 Q95,89 91,98 M109,94 Q103,81 114,82 M109,94 Q122,88 124,98" stroke="#2e7d32" stroke-width="3.5" fill="none" stroke-linecap="round"/></g>
+    <g class="palm" style="animation-delay:-1.5s"><path d="M294,112 Q298,96 292,84" stroke="#8d6e63" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M292,84 Q279,80 276,89 M292,84 Q291,72 301,74 M292,84 Q305,81 306,90" stroke="#388e3c" stroke-width="3.5" fill="none" stroke-linecap="round"/></g>
+  `;
+
+  // Stage 1 Buildings
+  if (b.tent) svg += `<g class="${pop('tent')}" transform="translate(110,94)"><polygon points="15,2 0,24 30,24" fill="#ff8a65" stroke="#bf360c" stroke-width="1.5"/><polygon points="15,2 10,24 20,24" fill="#ffe0b2"/></g>`;
+  if (b.fire) svg += `<g class="${pop('fire')}" transform="translate(157,118)"><ellipse cx="8" cy="13" rx="9" ry="3.5" fill="#78909c"/><path d="M8,2 C13,7 12,12 8,12 C4,12 3,7 8,2 Z" fill="#ff7043"/><path d="M8,6 C10,9 10,12 8,12 C6,12 6,9 8,6 Z" fill="#ffd54f"/></g>`;
+  if (b.bridge) svg += `<g class="${pop('bridge')}" transform="translate(212,124)"><rect x="0" y="4" width="26" height="10" rx="2" fill="#a1887f" stroke="#5d4037" stroke-width="1.5"/><path d="M4,4v10M10,4v10M16,4v10M22,4v10" stroke="#5d4037" stroke-width="1.2"/></g>`;
+
+  // Stage 2 Buildings
+  if (b.hut) svg += `<g class="${pop('hut')}" transform="translate(238,96)"><rect x="4" y="10" width="24" height="16" rx="2" fill="#ffe0b2" stroke="#8d6e63" stroke-width="1.5"/><polygon points="1,11 16,1 31,11" fill="#29b6f6"/><rect x="13" y="17" width="6" height="9" fill="#6d4c41"/></g>`;
+  if (b.pier) svg += `<g class="${pop('pier')}" transform="translate(268,140)"><rect x="0" y="3" width="34" height="9" rx="2" fill="#8d6e63"/><rect x="4" y="12" width="3" height="6" fill="#5d4037"/><rect x="26" y="12" width="3" height="6" fill="#5d4037"/></g>`;
+  if (b.boat) svg += `<g class="boat-bob${pop('boat')}" transform="translate(314,144)"><path d="M2,14 L26,14 L22,21 L6,21 Z" fill="#ef5350"/><polygon points="14,2 14,13 24,13" fill="#ffffff"/><line x1="14" y1="2" x2="14" y2="14" stroke="#5d4037" stroke-width="1.5"/></g>`;
+
+  // Stage 3 Buildings
+  if (b.lighthouse) svg += `<g class="${pop('lighthouse')}" transform="translate(80,50)"><polygon points="8,38 11,10 17,10 20,38" fill="#ffffff" stroke="#cfd8dc" stroke-width="1.2"/><rect x="9" y="20" width="10" height="5" fill="#ef5350"/><rect x="10" y="6" width="8" height="5" fill="#ffd54f"/><polygon points="14,3 8,7 20,7" fill="#ef5350"/></g>`;
+  if (b.quarry_b) svg += `<g class="${pop('quarry_b')}" transform="translate(132,68)"><polygon points="2,18 10,4 22,6 28,18" fill="#90a4ae"/><rect x="8" y="11" width="10" height="7" fill="#455a64"/></g>`;
+  if (b.forge) svg += `<g class="${pop('forge')}" transform="translate(174,58)"><rect x="4" y="10" width="24" height="14" rx="2" fill="#78909c"/><polygon points="2,11 16,3 30,11" fill="#455a64"/><rect x="21" y="1" width="5" height="9" fill="#546e7a"/><circle class="smoke" cx="23" cy="0" r="3" fill="#eceff1"/></g>`;
+
+  // Stage 4 Buildings
+  if (b.field) svg += `<g class="${pop('field')}" transform="translate(224,74)"><rect x="0" y="2" width="28" height="14" rx="3" fill="#fdd835" stroke="#f9a825" stroke-width="1.2"/><path d="M4,5h20M4,9h20M4,13h20" stroke="#f57f17" stroke-width="1.3"/></g>`;
+  if (b.mill) svg += `<g class="${pop('mill')}" transform="translate(272,56)"><polygon points="8,32 11,10 19,10 22,32" fill="#fff8e1" stroke="#bcaaa4" stroke-width="1.2"/><polygon points="15,4 9,11 21,11" fill="#ff7043"/><g class="mill-blades"><line x1="15" y1="2" x2="15" y2="24" stroke="#6d4c41" stroke-width="2"/><line x1="4" y1="13" x2="26" y2="13" stroke="#6d4c41" stroke-width="2"/></g></g>`;
+  if (b.bakery) svg += `<g class="${pop('bakery')}" transform="translate(198,86)"><rect x="3" y="9" width="24" height="14" rx="3" fill="#ffcc80" stroke="#e65100" stroke-width="1.2"/><path d="M2,10 Q15,0 28,10 Z" fill="#ef5350"/><circle cx="15" cy="16" r="4" fill="#5d4037"/></g>`;
+
+  // Stage 5 Buildings
+  if (b.workshop) svg += `<g class="${pop('workshop')}" transform="translate(148,86)"><rect x="3" y="9" width="24" height="14" rx="2" fill="#b3e5fc" stroke="#0288d1" stroke-width="1.2"/><polygon points="1,10 15,2 29,10" fill="#0288d1"/></g>`;
+  if (b.market) svg += `<g class="${pop('market')}" transform="translate(254,118)"><rect x="3" y="10" width="24" height="12" fill="#fff"/><path d="M1,10 L5,4 L25,4 L29,10 Z" fill="#ab47bc"/></g>`;
+  if (b.hall) svg += `<g class="${pop('hall')}" transform="translate(184,38)"><rect x="4" y="12" width="26" height="18" rx="2" fill="#fff" stroke="#ffb300" stroke-width="1.5"/><polygon points="1,13 17,2 33,13" fill="#ffb300"/><circle cx="17" cy="18" r="3.5" fill="#29b6f6"/></g>`;
+
+  // Villagers layer + Seagull
+  svg += '<g id="villagers-layer"></g>';
+  svg += '<g class="gull" transform="translate(0,26)"><path d="M0,4 Q5,0 10,4 Q15,0 20,4" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/></g>';
+
+  $('#island-svg').innerHTML = svg;
+  updateVillagersDOM();
+}
+
+function updateVillagersDOM() {
+  const layer = $('#villagers-layer');
+  if (!layer) return;
+  const t = performance.now() / 140;
+  layer.innerHTML = VILLAGERS.map((v, i) => {
+    const bob = v.wait > 0 ? 0 : Math.abs(Math.sin(t + i * 2)) * 2.2;
+    return `<g transform="translate(${v.x.toFixed(1)},${(v.y - bob).toFixed(1)})">
+      <ellipse cx="0" cy="2" rx="3.5" ry="1.5" fill="rgba(0,0,0,.2)"/>
+      <rect x="-2.6" y="-6" width="5.2" height="7" rx="2.5" fill="${v.col}"/>
+      <circle cx="0" cy="-9" r="2.7" fill="#ffe0b2"/>
+    </g>`;
+  }).join('');
+}
+
+function stepVillagers() {
+  const targets = getWalkTargets();
+  VILLAGERS.forEach(v => {
+    if (v.wait > 0) { v.wait--; return; }
+    const dx = v.tx - v.x, dy = v.ty - v.y;
+    const dist = Math.hypot(dx, dy);
+    if (dist < 2) {
+      v.wait = 45 + (Math.random() * 60 | 0);
+      const next = targets[Math.random() * targets.length | 0];
+      v.tx = next.x + (Math.random() * 14 - 7);
+      v.ty = next.y + (Math.random() * 8 - 4);
+    } else {
+      v.x += (dx / dist) * v.spd;
+      v.y += (dy / dist) * v.spd;
+    }
+  });
+  updateVillagersDOM();
+  requestAnimationFrame(stepVillagers);
+}
+
+/* ===== BOARD INTERACTION (TAP + DRAG & DROP) ===== */
+let selIdx = -1;
+let dragIdx = -1;
+
+function flt(txt, x, y, col) {
+  const d = document.createElement('div');
+  d.textContent = txt;
+  d.style.cssText = `left:${x}px;top:${y}px;color:${col || '#263849'}`;
+  $('#fl').appendChild(d);
+  setTimeout(() => d.remove(), 850);
+}
+
+function isNeeded(k, l) {
+  return S.orders.some(o => o.reqs.some(r => r.k === k && r.l === l));
+}
+
+function renderBoard(popIndex = -1) {
+  const bEl = $('#board');
+  bEl.innerHTML = S.board.map((c, i) => {
+    const alt = ((Math.floor(i / 6) + (i % 6)) % 2) ? ' alt' : '';
+    const sel = i === selIdx ? ' sel' : '';
+    const lock = c && c.lock ? ' locked' : '';
+    let match = '';
+    if (selIdx >= 0 && selIdx !== i && c && !lock) {
+      const sc = S.board[selIdx];
+      if (sc && sc.t === 'item' && c.t === 'item' && sc.k === c.k && sc.l === c.l && sc.l < CHAINS[c.k].items.length - 1) {
+        match = ' match';
+      }
+    } else if (selIdx >= 0 && selIdx !== i && c && c.lock) {
+      const sc = S.board[selIdx];
+      if (sc && sc.t === 'item' && sc.k === c.k && sc.l === c.l) match = ' match';
+    }
+
+    let inner = '';
+    if (c) {
+      const anim = i === popIndex ? ' merge-anim' : '';
+      inner += `<div class="${anim}" style="width:100%;height:100%;display:grid;place-items:center">${itemSVG(c.k, c.l)}</div>`;
+      if (c.t === 'item') {
+        inner += `<span class="lvl-dot">${c.l + 1}</span>`;
+        if (!c.lock && isNeeded(c.k, c.l)) inner += `<span class="need-dot"></span>`;
+      } else {
+        inner += `<span class="gen-ring">⚡</span>`;
+      }
+    }
+    return `<div class="cell${alt}${sel}${match}${lock}" data-i="${i}">${inner}</div>`;
+  }).join('');
+  renderSelBar();
+}
+
+function renderSelBar() {
+  const txt = $('#sel-txt'), acts = $('#sel-acts');
+  acts.innerHTML = '';
+  if (selIdx < 0 || !S.board[selIdx]) {
+    txt.textContent = 'Нажми на рощу ⚡ для добычи или соединяй пары';
+    return;
+  }
+  const c = S.board[selIdx];
+  if (c.t === 'gen') {
+    const g = GENS[c.k];
+    const lvl = S.genLvl[c.k] || 1;
+    txt.innerHTML = `<b>${g.name}</b> (Ур. ${lvl}) — нажми ещё раз (-1⚡)`;
+    const btn = document.createElement('button');
+    btn.className = 'btn-use';
+    btn.textContent = 'Добыть ⚡';
+    btn.onclick = () => triggerGen(selIdx);
+    acts.appendChild(btn);
+    return;
+  }
+  const ch = CHAINS[c.k];
+  const name = ch.items[c.l];
+  if (c.lock) {
+    txt.innerHTML = `🔒 <b>${name}</b> (Ур. ${c.l + 1}) — объедини с таким же!`;
+    return;
+  }
+  txt.innerHTML = `<b>${name}</b> (${ch.name} • Ур. ${c.l + 1}/${ch.items.length})`;
+
+  // If treasure chest (coin tier 3), allow opening!
+  if (c.k === 'coin' && c.l === 3) {
+    const op = document.createElement('button');
+    op.className = 'btn-use';
+    op.textContent = 'Открыть 🎁';
+    op.onclick = () => openChest(selIdx);
+    acts.appendChild(op);
+  } else if (c.k === 'coin') {
+    const col = document.createElement('button');
+    col.className = 'btn-use';
+    const val = [3, 10, 30][c.l] || 3;
+    col.textContent = `Забрать +${val}🪙`;
+    col.onclick = () => collectCoin(selIdx, val);
+    acts.appendChild(col);
+  }
+
+  if (isTutActive()) return;
+  // Bag button
+  if (S.bag.length < 4) {
+    const bg = document.createElement('button');
+    bg.className = 'btn-bag';
+    bg.textContent = 'В склад 🎒';
+    bg.onclick = () => moveToBag(selIdx);
+    acts.appendChild(bg);
+  }
+
+  // Sell button
+  const sellVal = Math.max(1, Math.pow(2, c.l));
+  const sb = document.createElement('button');
+  sb.className = 'btn-sell';
+  sb.textContent = `Продать +${sellVal}🪙`;
+  sb.onclick = () => {
+    S.coins += sellVal;
+    S.board[selIdx] = null;
+    selIdx = -1;
+    sfxTap(); hap('light');
+    updateAll();
+  };
+  acts.appendChild(sb);
+}
+
+function collectCoin(idx, val) {
+  const el = document.querySelector(`.cell[data-i="${idx}"]`);
+  const r = el ? el.getBoundingClientRect() : { left: 150, top: 300 };
+  S.coins += val;
+  S.board[idx] = null;
+  selIdx = -1;
+  sOrder(); hap('medium');
+  flt(`+${val} 🪙`, r.left + 10, r.top, '#d97706');
+  updateAll();
+}
+
+function openChest(idx) {
+  const el = document.querySelector(`.cell[data-i="${idx}"]`);
+  const r = el ? el.getBoundingClientRect() : { left: 150, top: 300 };
+  S.coins += 75;
+  S.en = Math.min(maxEn() + 15, S.en + 12);
+  S.board[idx] = null;
+  selIdx = -1;
+  sOrder(); note('success');
+  flt('+75 🪙 +12 ⚡', r.left - 10, r.top, '#0288d1');
+  updateAll();
+}
+
+function moveToBag(idx) {
+  if (S.bag.length >= 4 || !S.board[idx] || S.board[idx].lock) return;
+  S.bag.push(S.board[idx]);
+  S.board[idx] = null;
+  selIdx = -1;
+  sfxTap(); hap('light');
+  updateAll();
+}
+
+function triggerGen(idx) {
+  const c = S.board[idx];
+  if (!c || c.t !== 'gen') return;
+  regenEnergy();
+  const el = document.querySelector(`.cell[data-i="${idx}"]`);
+  const rect = el ? el.getBoundingClientRect() : { left: 150, top: 300 };
+
+  if (S.en <= 0) {
+    flt('Мало энергии ⚡', rect.left - 15, rect.top, '#ef4444');
+    note('error');
+    return;
+  }
+  const empty = [];
+  S.board.forEach((cell, i) => { if (!cell) empty.push(i); });
+  if (!empty.length) {
+    flt('Нет места на поле!', rect.left - 25, rect.top, '#ef4444');
+    note('error');
+    return;
+  }
+
+  S.en--;
+  if (S.en === maxEn() - 1) S.enTs = Date.now();
+
+  const g = GENS[c.k];
+  const gLvl = S.genLvl[c.k] || 1;
+  const isSub = Math.random() < g.subChance;
+  const chainKey = isSub ? g.sub : g.chain;
+  // Balanced tier-2 drop chance: 0% at lvl 1, 12% at lvl 2, 24% at lvl 3
+  const tier2Chance = (gLvl - 1) * 0.12;
+  const lvl = (!isSub && Math.random() < tier2Chance) ? 1 : 0;
+
+  // Pick nearest empty cell to generator
+  empty.sort((a, b) => {
+    const da = Math.hypot((a % 6) - (idx % 6), Math.floor(a / 6) - Math.floor(idx / 6));
+    const db = Math.hypot((b % 6) - (idx % 6), Math.floor(b / 6) - Math.floor(idx / 6));
+    return da - db;
+  });
+  const targetIdx = empty[0];
+  S.board[targetIdx] = { t: 'item', k: chainKey, l: lvl };
+  S.seen[chainKey][lvl] = 1;
+  if (S.tut === 0) advanceTut(0);
+  sSpawn(); hap('light');
+  updateAll(targetIdx);
+}
+
+function handleCellPair(from, to) {
+  if (from === to) return;
+  const A = S.board[from], B = S.board[to];
+  if (!A || A.lock) return;
+
+  // Move to empty cell
+  if (!B) {
+    S.board[to] = A;
+    S.board[from] = null;
+    selIdx = to;
+    sfxTap();
+    updateAll();
+    return;
+  }
+
+  // Merge two matching items!
+  if (A.t === 'item' && B.t === 'item' && A.k === B.k && A.l === B.l) {
+    if (S.tut >= 0 && S.tut <= 3 && A.k === 'wood' && A.l >= 2) {
+      const el = document.querySelector(`.cell[data-i="${to}"]`);
+      const r = el ? el.getBoundingClientRect() : { left: 140, top: 300 };
+      flt('Сначала сдай заказ сверху! 👆', Math.max(20, r.left - 40), r.top - 10, '#d97706');
+      note('warning');
+      selIdx = to;
+      renderBoard();
+      return;
+    }
+    const maxL = CHAINS[A.k].items.length - 1;
+    if (A.l >= maxL) {
+      selIdx = to;
+      renderBoard();
+      return;
+    }
+    const nextL = A.l + 1;
+    S.board[to] = { t: 'item', k: A.k, l: nextL };
+    S.board[from] = null;
+    S.seen[A.k][nextL] = 1;
+    selIdx = to;
+
+    const el = document.querySelector(`.cell[data-i="${to}"]`);
+    const r = el ? el.getBoundingClientRect() : { left: 160, top: 300 };
+    sMerge(nextL); hap('medium');
+
+    // Bonus coin drop on tier 3+ merge
+    if (nextL >= 3 && Math.random() < 0.35) {
+      const emp = S.board.findIndex(x => !x);
+      if (emp >= 0) {
+        S.board[emp] = { t: 'item', k: 'coin', l: 0 };
+        S.seen.coin[0] = 1;
+      }
+    }
+    if (B.lock) {
+      if (S.tut === 2) advanceTut(2);
+      flt('Клетка открыта! ✨', r.left - 20, r.top - 10, '#16a34a');
+    } else {
+      if (S.tut === 1) advanceTut(1);
+      flt(CHAINS[A.k].items[nextL], r.left - 10, r.top - 8, '#263849');
+    }
+    updateAll(to);
+    return;
+  }
+
+  // Swap two unlocked items/generators
+  if (!B.lock) {
+    S.board[to] = A;
+    S.board[from] = B;
+    selIdx = to;
+    sfxTap();
+    updateAll();
+  } else {
+    selIdx = to;
+    renderBoard();
+  }
+}
+
+/* Pointer Drag & Tap handling on board */
+const boardEl = $('#board');
+const ghostEl = $('#ghost');
+let ptrDownIdx = -1, isDragging = false, startX = 0, startY = 0;
+
+boardEl.addEventListener('pointerdown', e => {
+  const cell = e.target.closest('.cell');
+  if (!cell) return;
+  const idx = +cell.dataset.i;
+  ptrDownIdx = idx;
+  isDragging = false;
+  startX = e.clientX; startY = e.clientY;
+});
+
+window.addEventListener('pointermove', e => {
+  if (ptrDownIdx < 0) return;
+  const c = S.board[ptrDownIdx];
+  if (!c || c.lock) return;
+  if (!isDragging && Math.hypot(e.clientX - startX, e.clientY - startY) > 10) {
+    isDragging = true;
+    dragIdx = ptrDownIdx;
+    selIdx = ptrDownIdx;
+    ghostEl.innerHTML = itemSVG(c.k, c.l);
+    ghostEl.style.display = 'block';
+    renderBoard();
+  }
+  if (isDragging) {
+    ghostEl.style.left = e.clientX + 'px';
+    ghostEl.style.top = e.clientY + 'px';
+  }
+});
+
+window.addEventListener('pointerup', e => {
+  if (ptrDownIdx < 0) return;
+  if (isDragging) {
+    ghostEl.style.display = 'none';
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    const targetCell = el && el.closest('.cell');
+    if (targetCell) {
+      handleCellPair(dragIdx, +targetCell.dataset.i);
+    }
+  } else {
+    // Pure Tap
+    const idx = ptrDownIdx;
+    const c = S.board[idx];
+    if (selIdx === idx) {
+      if (c && c.t === 'gen') triggerGen(idx);
+      else if (c && c.t === 'item' && !c.lock && c.k === 'coin' && c.l === 3) openChest(idx);
+      else if (c && c.t === 'item' && !c.lock && c.k === 'coin') collectCoin(idx, [3, 10, 30][c.l]);
+      else { selIdx = -1; renderBoard(); }
+    } else if (selIdx >= 0 && S.board[selIdx] && !S.board[selIdx].lock && c && c.t === 'item' && S.board[selIdx].t === 'item' && S.board[selIdx].k === c.k && S.board[selIdx].l === c.l) {
+      handleCellPair(selIdx, idx);
+    } else {
+      selIdx = c ? idx : -1;
+      sfxTap();
+      renderBoard();
+    }
+  }
+  ptrDownIdx = -1;
+  dragIdx = -1;
+  isDragging = false;
+});
+
+/* ===== ORDERS RENDER & FULFILL ===== */
+function checkOrderReady(ord) {
+  const used = new Set();
+  return ord.reqs.map(r => {
+    const idx = S.board.findIndex((c, i) => !used.has(i) && c && c.t === 'item' && !c.lock && c.k === r.k && c.l === r.l);
+    if (idx >= 0) { used.add(idx); return idx; }
+    return -1;
+  });
+}
+
+function renderOrders() {
+  const wrap = $('#orders');
+  wrap.innerHTML = S.orders.map((o, oi) => {
+    const matches = checkOrderReady(o);
+    const ready = matches.every(i => i >= 0);
+    const itemsHtml = o.reqs.map((r, ri) => {
+      const has = matches[ri] >= 0;
+      return `<div class="ord-it${has ? ' has' : ''}" data-oi="${oi}" data-ri="${ri}" title="${CHAINS[r.k].items[r.l]}">
+        <div style="width:30px;height:30px">${itemSVG(r.k, r.l)}</div>
+        ${has ? '<span class="chk">✓</span>' : ''}
+      </div>`;
+    }).join('');
+    return `<div class="ord${ready ? ' ready' : ''}">
+      <div class="ord-items">${itemsHtml}</div>
+      <div class="ord-rew">+${o.coins}🪙<br>+${o.stars}⭐</div>
+      <button class="ord-go" data-oi="${oi}" ${ready ? '' : 'disabled'}>Сдать</button>
+      <button class="ord-more" data-oi="${oi}" title="Условия заказа">•••</button>
+    </div>`;
+  }).join('');
+}
+
+let inspectOrder = null;
+$('#orders').onclick = e => {
+  const moreBtn = e.target.closest('.ord-more');
+  if (moreBtn) {
+    const oi = +moreBtn.dataset.oi;
+    if (S.orders[oi]) {
+      inspectOrder = { oi, ri: 0 };
+      sfxTap(); hap('light');
+      openModal('order_info');
+    }
+    return;
+  }
+  const itBox = e.target.closest('.ord-it');
+  if (itBox) {
+    const oi = +itBox.dataset.oi;
+    const ri = +itBox.dataset.ri;
+    const ord = S.orders[oi];
+    if (ord) {
+      inspectOrder = { oi, ri };
+      sfxTap(); hap('light');
+      openModal('order_info');
+    }
+    return;
+  }
+  const btn = e.target.closest('.ord-go');
+  if (!btn) return;
+  const oi = +btn.dataset.oi;
+  const ord = S.orders[oi];
+  if (!ord) return;
+  const matches = checkOrderReady(ord);
+  if (matches.some(i => i < 0)) return;
+
+  matches.forEach(idx => { S.board[idx] = null; });
+  S.coins += ord.coins;
+  S.stars += ord.stars;
+  selIdx = -1;
+  S.orders.splice(oi, 1);
+  if (S.tut === 3) advanceTut(3);
+  refillOrders();
+
+  const r = btn.getBoundingClientRect();
+  sOrder(); note('success');
+  flt(`+${ord.coins}🪙 +${ord.stars}⭐`, r.left - 20, r.top + 30, '#16a34a');
+  updateAll();
+};
+
+/* ===== MODALS: BUILD, BAG, ATLAS, SETTINGS ===== */
+let curTab = 'board';
+if (tg && tg.BackButton) {
+  try { tg.BackButton.onClick(() => { if (curTab !== 'board') openModal('board'); }); } catch (e) {}
+}
+function openModal(tab) {
+  if (isTutActive() && tab !== 'board' && tab !== 'order_info' && !(S.tut === 4 && tab === 'build')) return;
+  curTab = tab;
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+  if (tg && tg.BackButton) {
+    try { tab === 'board' ? tg.BackButton.hide() : tg.BackButton.show(); } catch (e) {}
+  }
+  if (tab === 'board') { $('#modal').classList.remove('on'); return; }
+  $('#modal').classList.add('on');
+  renderModal();
+}
+
+function renderModal() {
+  const title = $('#m-title'), body = $('#m-body');
+  if (curTab === 'build') {
+    title.textContent = `🏗 Стройка острова (Этап ${S.stage + 1}/5)`;
+    const stageBlds = BUILDINGS.filter(b => b.st <= S.stage);
+    // Generator upgrade cards (balanced: max lvl 3, expensive)
+    const genKeys = ['g_wood', ...(S.built.quarry_b ? ['g_stone'] : []), ...(S.built.field ? ['g_food'] : [])];
+    const genHtml = genKeys.map(gk => {
+      const g = GENS[gk], lvl = S.genLvl[gk] || 1, mx = lvl >= 3;
+      const cost = lvl === 1 ? 180 : 420;
+      return `<div class="card-row">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:42px;height:42px;flex:none">${itemSVG(gk, 0)}</div>
+          <div><b>${g.name} • Ур. ${lvl}/3</b><div style="font-size:12px;color:var(--muted)">Шанс предмета 2-го ур.: ${lvl * 12}%</div></div>
+        </div>
+        <button class="act-btn" data-upgen="${gk}" ${mx || S.coins < cost ? 'disabled' : ''}>${mx ? 'Макс' : cost + ' 🪙'}</button>
+      </div>`;
+    }).join('');
+
+    const bldHtml = stageBlds.map(b => {
+      const done = !!S.built[b.id];
+      const can = !done && S.stars >= b.stars && S.coins >= b.coins;
+      return `<div class="card-row${done ? ' done' : ''}">
+        <div>
+          <b>${done ? '✅ ' : '🔨 '}${b.name}</b>
+          <div style="font-size:12px;color:var(--muted)">${b.desc}</div>
+          ${done ? '' : `<div style="font-size:12px;font-weight:800;margin-top:2px">Нужно: ${b.stars}⭐ и ${b.coins}🪙</div>`}
+        </div>
+        <button class="act-btn" data-bld="${b.id}" ${done || !can ? 'disabled' : ''}>${done ? 'Построено' : 'Построить'}</button>
+      </div>`;
+    }).join('');
+
+    body.innerHTML = `<div style="font-size:12px;font-weight:800;color:var(--muted)">ПОСТРОЙКИ ЭТАПА</div>${bldHtml}
+      <div style="font-size:12px;font-weight:800;color:var(--muted);margin-top:6px">УЛУЧШЕНИЕ ИСТОЧНИКОВ</div>${genHtml}`;
+  } else if (curTab === 'bag') {
+    title.textContent = `🎒 Склад (${S.bag.length}/4)`;
+    const slots = [0, 1, 2, 3].map(i => {
+      const it = S.bag[i];
+      if (!it) return `<div class="bag-slot"><span style="font-size:11px;color:#a89878">Пусто</span></div>`;
+      return `<div class="bag-slot filled" data-bi="${i}" title="Вернуть на поле">
+        <div style="width:65%;height:65%">${itemSVG(it.k, it.l)}</div>
+        <span class="lvl-dot">${it.l + 1}</span>
+      </div>`;
+    }).join('');
+    body.innerHTML = `<p style="margin:0;font-size:13px;color:var(--muted)">Нажми на предмет на складе, чтобы вернуть его на свободную клетку поля.</p>
+      <div class="bag-grid">${slots}</div>`;
+  } else if (curTab === 'atlas') {
+    title.textContent = '📖 Атлас открытий';
+    body.innerHTML = Object.keys(CHAINS).map(k => {
+      const ch = CHAINS[k];
+      const cells = ch.items.map((nm, l) => {
+        const ok = S.seen[k] && S.seen[k][l];
+        return `<div class="atlas-cell${ok ? '' : ' unk'}">
+          <div style="width:28px;height:28px">${ok ? itemSVG(k, l) : '❓'}</div>
+          <span>${ok ? nm : '???'}</span>
+        </div>`;
+      }).join('');
+      return `<div class="atlas-chain"><b>${ch.name}</b><div class="atlas-items">${cells}</div></div>`;
+    }).join('');
+  } else if (curTab === 'order_info' && inspectOrder && S.orders[inspectOrder.oi]) {
+    const ord = S.orders[inspectOrder.oi];
+    const matches = checkOrderReady(ord);
+    title.textContent = '📋 Параметры заказа';
+    const sourceMap = {
+      wood: 'Добывается из: <b>Лесная роща ⚡</b>',
+      stone: S.built.quarry_b ? 'Добывается из: <b>Каменный карьер ⚡</b>' : 'Откроется после постройки: <b>Склад камня</b> (Этап 3)',
+      food: S.built.field ? 'Добывается из: <b>Плодородная грядка ⚡</b>' : 'Откроется после постройки: <b>Золотые грядки</b> (Этап 4)',
+      tool: 'Выпадает при добыче из <b>Лесной рощи</b> и <b>Карьера ⚡</b>',
+      coin: 'Выпадает с <b>Грядки</b> и при слиянии предметов 3+ ур.'
+    };
+    const reqCards = ord.reqs.map((r, ri) => {
+      const ch = CHAINS[r.k];
+      const name = ch.items[r.l];
+      const hasOnBoard = matches[ri] >= 0;
+      const stepsHtml = ch.items.slice(0, r.l + 1).map((stName, lvl) => {
+        const isTarget = lvl === r.l;
+        const owned = S.board.some(c => c && c.t === 'item' && !c.lock && c.k === r.k && c.l === lvl);
+        return `${lvl > 0 ? '<span style="color:#a89878;font-weight:900">→</span>' : ''}
+          <div class="chain-step${isTarget ? ' target' : (owned ? ' owned' : '')}">
+            <div style="width:26px;height:26px">${itemSVG(r.k, lvl)}</div>
+            <span>${stName}</span>
+            <span style="color:var(--muted)">Ур.${lvl + 1}</span>
+          </div>`;
+      }).join('');
+      return `<div class="card-row" style="flex-direction:column;align-items:stretch;gap:6px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:44px;height:44px;flex:none;background:#f4efe4;border-radius:12px;display:grid;place-items:center">${itemSVG(r.k, r.l)}</div>
+            <div>
+              <b>${name}</b> <span style="font-size:11px;color:var(--muted)">(${ch.name} • Ур. ${r.l + 1})</span>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px">${sourceMap[r.k] || ''}</div>
+            </div>
+          </div>
+          <span style="font-size:11px;font-weight:900;padding:4px 8px;border-radius:9px;background:${hasOnBoard ? '#dcfce7;color:#15803d' : '#fef3c7;color:#b45309'}">
+            ${hasOnBoard ? 'Есть на поле ✓' : 'Нужно собрать'}
+          </span>
+        </div>
+        <div style="font-size:11px;font-weight:800;color:var(--muted)">Цепочка слияния (соединяй пары одинаковых):</div>
+        <div class="chain-row">${stepsHtml}</div>
+      </div>`;
+    }).join('');
+    body.innerHTML = `
+      <div class="card-row" style="background:#f8fafc">
+        <div><b>Награда за выполнение заказа</b><div style="font-size:12px;color:var(--muted)">Собери все нужные предметы на поле</div></div>
+        <div style="font-size:15px;font-weight:900;text-align:right">+${ord.coins} 🪙 &nbsp; +${ord.stars} ⭐</div>
+      </div>
+      ${reqCards}`;
+  } else if (curTab === 'audio') {
+    title.textContent = '🎵 Музыка и настройки';
+    body.innerHTML = `
+      <div class="card-row">
+        <div><b>Фоновая музыка</b><div style="font-size:12px;color:var(--muted)">Автоматически играет <code>music.mp3</code> из папки игры</div></div>
+        <button class="act-btn" id="tog-snd">${S.mute ? 'Включить 🔊' : 'Выключить 🔇'}</button>
+      </div>
+      <div class="card-row">
+        <div><b>Проверить свой трек прямо сейчас</b><div style="font-size:12px;color:var(--muted)">Выбери MP3/OGG с телефона для теста</div></div>
+        <label class="act-btn" style="cursor:pointer">Выбрать файл<input type="file" id="pick-mp3" accept="audio/*" style="display:none"></label>
+      </div>
+      <div class="card-row">
+        <div><b>Обучение</b><div style="font-size:12px;color:var(--muted)">Пройти подсказки островитянина заново</div></div>
+        <button class="act-btn" style="background:#0288d1;box-shadow:0 3px 0 #0369a1" id="rpl-tut">Повторить</button>
+      </div>
+      <div class="card-row">
+        <div><b>Сброс прогресса</b><div style="font-size:12px;color:var(--muted)">Начать остров заново</div></div>
+        <button class="act-btn" style="background:#ef4444;box-shadow:0 3px 0 #991b1b" id="rst-game">Сбросить</button>
+      </div>`;
+  }
+}
+
+$('#m-body').onclick = e => {
+  // Build building
+  const bBtn = e.target.closest('[data-bld]');
+  if (bBtn) {
+    const b = BUILDINGS.find(x => x.id === bBtn.dataset.bld);
+    if (!b || S.built[b.id] || S.stars < b.stars || S.coins < b.coins) return;
+    S.stars -= b.stars;
+    S.coins -= b.coins;
+    S.built[b.id] = 1;
+    S.lastPop = b.id;
+    if (S.tut === 4) advanceTut(4);
+
+    // Grant new generator onto board if applicable
+    if (b.grantGen) {
+      const emp = S.board.findIndex(x => !x);
+      if (emp >= 0) S.board[emp] = { t: 'gen', k: b.grantGen, l: 1 };
+      else S.bag.push({ t: 'gen', k: b.grantGen, l: 1 });
+    }
+
+    // Check stage completion
+    const stBlds = STAGES[S.stage].blds;
+    if (stBlds.every(id => S.built[id]) && S.stage < STAGES.length - 1) {
+      S.stage++;
+      S.en = maxEn();
+      refillOrders();
+    }
+
+    sBuild(); note('success');
+    openModal('board');
+    updateAll();
+    setTimeout(() => { S.lastPop = ''; }, 900);
+    return;
+  }
+
+  // Upgrade generator
+  const gBtn = e.target.closest('[data-upgen]');
+  if (gBtn) {
+    const gk = gBtn.dataset.upgen;
+    const lvl = S.genLvl[gk] || 1;
+    const cost = lvl === 1 ? 180 : 420;
+    if (lvl >= 3 || S.coins < cost) return;
+    S.coins -= cost;
+    S.genLvl[gk] = lvl + 1;
+    sBuild(); hap('medium');
+    renderModal();
+    updateHud();
+    save();
+    return;
+  }
+
+  // Take from bag
+  const bagSlot = e.target.closest('[data-bi]');
+  if (bagSlot) {
+    const bi = +bagSlot.dataset.bi;
+    const emp = S.board.findIndex(x => !x);
+    if (emp < 0) { flt('Нет места на поле!', 120, 260, '#ef4444'); return; }
+    S.board[emp] = S.bag[bi];
+    S.bag.splice(bi, 1);
+    sfxTap(); hap('light');
+    renderModal();
+    updateAll(emp);
+    return;
+  }
+
+  if (e.target.id === 'tog-snd') {
+    S.mute = S.mute ? 0 : 1;
+    syncAudio();
+    renderModal();
+    save();
+  }
+  if (e.target.id === 'rpl-tut') { S.tut = 0; openModal('board'); updateAll(); return; }
+  if (e.target.id === 'rst-game') {
+    localStorage.removeItem(SAVE_KEY);
+    location.reload();
+  }
+};
+
+$('#m-body').onchange = e => {
+  if (e.target.id === 'pick-mp3' && e.target.files[0]) {
+    if (customBlobUrl) URL.revokeObjectURL(customBlobUrl);
+    customBlobUrl = URL.createObjectURL(e.target.files[0]);
+    bgm.src = customBlobUrl;
+    bgmReady = true;
+    S.mute = 0;
+    syncAudio();
+    flt('Трек загружен! 🎵', 120, 220, '#0f766e');
+  }
+};
+
+$('#m-close').onclick = () => openModal('board');
+$('#modal').onclick = e => { if (e.target.id === 'modal') openModal('board'); };
+$('#btn-build').onclick = () => openModal('build');
+$('#btn-mute').onclick = () => openModal('audio');
+$('#tut-skip').onclick = () => { S.tut = 5; sfxTap(); updateAll(); };
+$('#nav').addEventListener('click', e => {
+  const btn = e.target.closest('.nav-btn');
+  if (btn) openModal(btn.dataset.tab);
+});
+
+
+/* ===== INTERACTIVE VILLAGER TUTORIAL (5 STEPS, NO REWARD) ===== */
+const TUT_STEPS = [
+  { tag: 'Шаг 1/5 • Добыча', msg: 'Нажми на <b>Лесную рощу ⚡</b> в центре поля, чтобы добыть ресурс!' },
+  { tag: 'Шаг 2/5 • Слияние', msg: 'Перетащи <b>Ветку</b> на другую такую же <b>Ветку</b>, чтобы получить Бревно.' },
+  { tag: 'Шаг 3/5 • Пыль', msg: 'Перетащи свободное <b>Бревно</b> на запылённое <b>Бревно</b>, чтобы открыть клетку!' },
+  { tag: 'Шаг 4/5 • Заказ', msg: 'Отлично! Нажми <b>Сдать</b> на первом заказе сверху за монеты и звёзды.' },
+  { tag: 'Шаг 5/5 • Стройка', msg: 'Нажми <b>🔨 Строить</b> и возведи <b>Костёр путешественника</b>!' }
+];
+
+function isTutActive() {
+  return typeof S.tut === 'number' && S.tut >= 0 && S.tut < 5;
+}
+
+function advanceTut(stepCompleted) {
+  if (S.tut !== stepCompleted) return;
+  S.tut++;
+  if (S.tut >= 5) {
+    S.tut = 5;
+    note('success');
+    flt('Обучение завершено! 🏝', 95, 240, '#0f766e');
+  }
+}
+
+function renderTutorial() {
+  const box = $('#tut-box');
+  const active = isTutActive();
+  document.body.classList.toggle('tut-active', active);
+  box.classList.toggle('on', active);
+
+  // Clear previous highlights & dims
+  document.querySelectorAll('.tut-pulse').forEach(el => el.classList.remove('tut-pulse'));
+  document.querySelectorAll('.tut-dim').forEach(el => el.classList.remove('tut-dim'));
+
+  if (!active) return;
+
+  const st = TUT_STEPS[S.tut];
+  $('#tut-step').textContent = st.tag;
+  $('#tut-msg').innerHTML = st.msg;
+
+  // Block unrelated top/bottom controls during tutorial
+  $('#btn-mute').classList.add('tut-dim');
+  if (S.tut < 4) {
+    $('#btn-build').classList.add('tut-dim');
+    $('#nav').classList.add('tut-dim');
+  } else {
+    // Step 5: highlight Строить button & Стройка tab
+    $('#btn-build').classList.add('tut-pulse');
+    document.querySelectorAll('.nav-btn').forEach(b => {
+      if (b.dataset.tab === 'build') b.classList.add('tut-pulse');
+      else b.classList.add('tut-dim');
+    });
+  }
+
+  if (S.tut !== 3) {
+    $('#orders').classList.add('tut-dim');
+  } else {
+    const firstGo = $('#orders .ord-go');
+    if (firstGo) firstGo.classList.add('tut-pulse');
+  }
+
+  // Highlight relevant board cells
+  if (S.tut === 0) {
+    const gi = S.board.findIndex(c => c && c.t === 'gen');
+    const gEl = gi >= 0 && document.querySelector(`.cell[data-i="${gi}"]`);
+    if (gEl) gEl.classList.add('tut-pulse');
+  } else if (S.tut === 1) {
+    S.board.forEach((c, i) => {
+      if (c && c.t === 'item' && !c.lock && c.k === 'wood' && c.l === 0) {
+        const el = document.querySelector(`.cell[data-i="${i}"]`);
+        if (el) el.classList.add('tut-pulse');
+      }
+    });
+  } else if (S.tut === 2) {
+    S.board.forEach((c, i) => {
+      if (c && c.t === 'item' && c.k === 'wood' && c.l === 1) {
+        const el = document.querySelector(`.cell[data-i="${i}"]`);
+        if (el) el.classList.add('tut-pulse');
+      }
+    });
+  }
+}
+
+/* ===== HUD & LOOP ===== */
+function updateHud() {
+  regenEnergy();
+  const cap = maxEn();
+  $('#h-en').textContent = `${S.en}/${cap}`;
+  if (S.en >= cap) {
+    $('#h-ent').textContent = 'Максимум';
+  } else {
+    const left = Math.max(1, Math.ceil((30000 - ((Date.now() - S.enTs) % 30000)) / 1000));
+    $('#h-ent').textContent = `+1 через ${left}с`;
+  }
+  $('#h-coin').textContent = S.coins;
+  $('#h-star').textContent = S.stars;
+  $('#h-stg').textContent = `Этап ${S.stage + 1}/5`;
+  $('#stage-lbl').textContent = `🏝 ${STAGES[S.stage].name}`;
+  $('#bdg-bag').textContent = `${S.bag.length}/4`;
+
+  // Check if any building is ready to construct
+  const readyBlds = BUILDINGS.filter(b => b.st <= S.stage && !S.built[b.id] && S.stars >= b.stars && S.coins >= b.coins).length;
+  $('#bdg-build').style.display = readyBlds ? 'inline-block' : 'none';
+  $('#bdg-build').textContent = readyBlds;
+  $('#build-cnt').textContent = readyBlds ? `(${readyBlds})` : '';
+  $('#btn-build').classList.toggle('pulse', readyBlds > 0);
+}
+
+function updateAll(popIndex = -1) {
+  updateHud();
+  renderIsland();
+  renderOrders();
+  renderBoard(popIndex);
+  renderTutorial();
+  if (curTab !== 'board') renderModal();
+  save();
+}
+
+/* ===== BOOT ===== */
+store.get(SAVE_KEY).then(raw => {
+  try {
+    if (raw) {
+      const o = JSON.parse(raw);
+      S = Object.assign(S, o);
+      if (typeof o.tut !== 'number') S.tut = 5;
+      S.built = o.built || {};
+      S.genLvl = Object.assign({ g_wood: 1, g_stone: 1, g_food: 1 }, o.genLvl);
+      S.bag = o.bag || [];
+      S.orders = o.orders || [];
+    }
+  } catch (e) {}
+  if (!S.board || S.board.length !== 30) initNewBoard();
+  refillOrders();
+  updateAll();
+  setInterval(updateHud, 1000);
+  requestAnimationFrame(stepVillagers);
+});
+</script>
+</body>
+</html>
