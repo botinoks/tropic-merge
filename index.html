@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Tropic Merge — Merge & Build</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script type="text/javascript" src="https://me.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=r0jVt5hyiloM4fO1zdu8wp6jLbrw65qhHP6HKfwYQATkdPlPvxMpBKMhWxdIttgtQK9uOnGTnMgqetWb8qUPmZ6hO1SrCfHqGWLvf4y7xgFeDVo8XitkcJZt7dPfHSPEqgrwU8BOh07EdC59C81huCSLKc2LxNMYFxAhjNNtFbYfuF0nxRZGXcalLek6NswhdEXk0wgnIdiPKIfR6xLBtRZFUhiN47eH3HfanK74JED4-AncxRO91lpKcx0k2OcSet70iIhkhacK5RpKkd1HCReQXbriXxVnZuCVbfQDF0w-pPe1r6pxHeGwDTxPDJe0" charset="UTF-8"></script><script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -35,7 +35,8 @@ body{
 
 /* ===== TOP WIDGETS ===== */
 #hud{
-  padding:calc(var(--top-safe, 86px) + 4px) 10px 6px;
+  flex:none;
+  padding:var(--top-safe, 62px) 10px 5px;
   display:grid;
   grid-template-columns:1.25fr 1fr 1fr auto;
   gap:6px;
@@ -70,9 +71,9 @@ body{
 #island-wrap{
   position:relative;
   margin:0 10px;
-  height:25dvh;
-  min-height:152px;
-  max-height:225px;
+  height:21dvh;
+  min-height:130px;
+  max-height:195px;
   border-radius:22px;
   overflow:hidden;
   background:radial-gradient(circle at 50% 35%,#79ece2 0%,#39c2bc 68%,#26a3a6 100%);
@@ -159,6 +160,19 @@ body{
   transition:.15s;
 }
 .ord.ready{border-color:#4cd964;background:#f2fff4}
+.ord-items{display:flex;align-items:center;gap:5px}
+.ord-it{
+  position:relative;width:34px;height:34px;border-radius:10px;
+  background:#f7f2e7;border:1.5px solid #e5d7bc;
+  display:grid;place-items:center;flex:none;
+}
+.ord-it.has{background:#dcfce7;border-color:#22c55e}
+.ord-it .chk{
+  position:absolute;bottom:-3px;right:-3px;
+  width:14px;height:14px;border-radius:50%;
+  background:#22c55e;color:#fff;font-size:9px;font-weight:900;
+  display:grid;place-items:center;border:1.5px solid #fff;
+}
 .chain-row{
   display:flex;align-items:center;gap:4px;overflow-x:auto;padding:4px 0;
 }
@@ -191,21 +205,25 @@ body{
 
 /* ===== MERGE BOARD (5x6) ===== */
 #board-area{
-  flex:1;
+  flex:1 1 0%;
   padding:2px 10px 4px;
   display:flex;
   flex-direction:column;
+  align-items:center;
   justify-content:center;
   min-height:0;
+  overflow:hidden;
 }
 #board{
   display:grid;
-  grid-template-columns:repeat(6,1fr);
-  grid-template-rows:repeat(5,1fr);
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  grid-template-rows:repeat(5,minmax(0,1fr));
   gap:5px;
   width:100%;
   height:100%;
-  max-height:340px;
+  max-height:100%;
+  min-height:0;
+  overflow:hidden;
   background:rgba(255,255,255,.38);
   padding:6px;
   border-radius:20px;
@@ -213,6 +231,9 @@ body{
 }
 .cell{
   position:relative;
+  min-width:0;
+  min-height:0;
+  overflow:hidden;
   border-radius:13px;
   background:#fdf6e7;
   box-shadow:0 2px 0 rgba(168,140,86,.35);
@@ -276,22 +297,29 @@ body{
 
 /* ===== INFO BAR ABOVE NAV ===== */
 #sel-bar{
-  margin:0 10px 4px;
-  background:rgba(255,255,255,.92);
+  flex:none;
+  position:relative;
+  z-index:12;
+  margin:2px 10px 5px;
+  background:rgba(255,255,255,.96);
   border-radius:14px;
-  padding:5px 10px;
+  padding:6px 10px;
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:8px;
-  min-height:36px;
+  min-height:44px;
   font-size:12px;
-  box-shadow:0 2px 0 rgba(38,56,73,.1);
+  line-height:1.25;
+  box-shadow:0 2px 6px rgba(38,56,73,.12);
 }
+#sel-txt{min-width:0;flex:1}
+#sel-acts{flex:none}
 #sel-bar button{
   border:none;border-radius:10px;
-  padding:4px 9px;
+  padding:6px 10px;
   font-family:inherit;font-weight:800;font-size:11px;
+  white-space:nowrap;
   cursor:pointer;
 }
 .btn-sell{background:#fee2e2;color:#b91c1c}
@@ -300,6 +328,7 @@ body{
 
 /* ===== BOTTOM CONTROL MENU ===== */
 #nav{
+  flex:none;
   background:#ffffff;
   padding:6px 10px max(8px,env(safe-area-inset-bottom));
   display:grid;
@@ -540,7 +569,7 @@ function applySafeArea() {
     top = sTop + cTop;
   } catch (e) {}
   const inTg = !!(tg && tg.platform && tg.platform !== 'unknown');
-  const finalTop = Math.max(top, inTg ? 86 : 10);
+  const finalTop = top > 0 ? Math.max(54, top - 22) : (inTg ? 62 : 8);
   document.documentElement.style.setProperty('--top-safe', finalTop + 'px');
 }
 applySafeArea();
@@ -1021,12 +1050,25 @@ function flt(txt, x, y, col) {
   setTimeout(() => d.remove(), 850);
 }
 
-function isNeeded(k, l) {
-  return S.orders.some(o => o.reqs.some(r => r.k === k && r.l === l));
+function getBoardNeedSet() {
+  const needed = new Set();
+  const poolUsed = new Set();
+  S.orders.forEach(o => {
+    if (!o || !Array.isArray(o.reqs)) return;
+    o.reqs.forEach(r => {
+      const idx = S.board.findIndex((c, i) => !poolUsed.has(i) && c && c.t === 'item' && !c.lock && c.k === r.k && c.l === r.l);
+      if (idx >= 0) {
+        poolUsed.add(idx);
+        needed.add(idx);
+      }
+    });
+  });
+  return needed;
 }
 
 function renderBoard(popIndex = -1) {
   const bEl = $('#board');
+  const neededCells = getBoardNeedSet();
   bEl.innerHTML = S.board.map((c, i) => {
     const alt = ((Math.floor(i / 6) + (i % 6)) % 2) ? ' alt' : '';
     const sel = i === selIdx ? ' sel' : '';
@@ -1048,7 +1090,7 @@ function renderBoard(popIndex = -1) {
       inner += `<div class="${anim}" style="width:100%;height:100%;display:grid;place-items:center">${itemSVG(c.k, c.l)}</div>`;
       if (c.t === 'item') {
         inner += `<span class="lvl-dot">${c.l + 1}</span>`;
-        if (!c.lock && isNeeded(c.k, c.l)) inner += `<span class="need-dot"></span>`;
+        if (!c.lock && neededCells.has(i)) inner += `<span class="need-dot"></span>`;
       } else {
         inner += `<span class="gen-ring">⚡</span>`;
       }
@@ -1332,6 +1374,7 @@ window.addEventListener('pointerup', e => {
 
 /* ===== ORDERS RENDER, TOUCH SWIPE & FULFILL ===== */
 function checkOrderReady(ord) {
+  if (!ord || !Array.isArray(ord.reqs) || ord.reqs.length === 0) return [];
   const used = new Set();
   return ord.reqs.map(r => {
     const idx = S.board.findIndex((c, i) => !used.has(i) && c && c.t === 'item' && !c.lock && c.k === r.k && c.l === r.l);
@@ -1340,12 +1383,36 @@ function checkOrderReady(ord) {
   });
 }
 
+function isOrderComplete(ord, matches) {
+  if (!ord || !Array.isArray(ord.reqs) || ord.reqs.length === 0) return false;
+  if (!Array.isArray(matches) || matches.length !== ord.reqs.length) return false;
+  const unique = new Set();
+  for (let ri = 0; ri < ord.reqs.length; ri++) {
+    const idx = matches[ri];
+    const req = ord.reqs[ri];
+    if (typeof idx !== 'number' || idx < 0 || idx >= S.board.length || unique.has(idx)) return false;
+    const cell = S.board[idx];
+    if (!cell || cell.t !== 'item' || cell.lock || cell.k !== req.k || cell.l !== req.l) return false;
+    unique.add(idx);
+  }
+  return true;
+}
+
 function renderOrders() {
   const wrap = $('#orders');
   wrap.innerHTML = S.orders.map((o, oi) => {
     const matches = checkOrderReady(o);
-    const ready = matches.every(i => i >= 0);
+    const ready = isOrderComplete(o, matches);
+    const itemsHtml = (o.reqs || []).map((r, ri) => {
+      const has = matches[ri] >= 0;
+      const nm = (CHAINS[r.k] && CHAINS[r.k].items[r.l]) || '';
+      return `<div class="ord-it${has ? ' has' : ''}" title="${nm} (Ур. ${r.l + 1})">
+        <div style="width:26px;height:26px">${itemSVG(r.k, r.l)}</div>
+        ${has ? '<span class="chk">✓</span>' : ''}
+      </div>`;
+    }).join('');
     return `<div class="ord${ready ? ' ready' : ''}">
+      <div class="ord-items">${itemsHtml}</div>
       <div class="ord-rew">+${o.coins}🪙<br>+${o.stars}⭐</div>
       <button class="ord-go" data-oi="${oi}" ${ready ? '' : 'disabled'}>Сдать</button>
       <button class="ord-more" data-oi="${oi}" title="Условия заказа">•••</button>
@@ -1391,7 +1458,7 @@ ordersEl.onclick = e => {
   const ord = S.orders[oi];
   if (!ord) return;
   const matches = checkOrderReady(ord);
-  if (matches.some(i => i < 0)) return;
+  if (!isOrderComplete(ord, matches)) return;
 
   matches.forEach(idx => { S.board[idx] = null; });
   S.coins += ord.coins;
@@ -1485,6 +1552,10 @@ function renderModal() {
   } else if (curTab === 'order_info' && inspectOrder && S.orders[inspectOrder.oi]) {
     const ord = S.orders[inspectOrder.oi];
     const matches = checkOrderReady(ord);
+    const complete = isOrderComplete(ord, matches);
+    const readyCount = matches.filter(i => i >= 0).length;
+    const reservedCells = new Set(matches.filter(i => i >= 0));
+    const usedBagSlots = new Set();
     title.textContent = '📋 Параметры заказа';
     const sourceMap = {
       wood: 'Добывается из: <b>Лесная роща ⚡</b>',
@@ -1520,9 +1591,26 @@ function renderModal() {
       const ch = CHAINS[r.k];
       const name = ch.items[r.l];
       const hasOnBoard = matches[ri] >= 0;
+      const bagIdx = !hasOnBoard ? S.bag.findIndex((it, bi) => !usedBagSlots.has(bi) && it && it.t === 'item' && it.k === r.k && it.l === r.l) : -1;
+      if (bagIdx >= 0) usedBagSlots.add(bagIdx);
+      const hasLocked = !hasOnBoard && bagIdx < 0 && S.board.some(c => c && c.t === 'item' && c.lock && c.k === r.k && c.l === r.l);
+
+      let statusText = 'Нужно собрать';
+      let statusStyle = 'background:#fef3c7;color:#b45309';
+      if (hasOnBoard) {
+        statusText = 'Есть на поле ✓';
+        statusStyle = 'background:#dcfce7;color:#15803d';
+      } else if (bagIdx >= 0) {
+        statusText = 'На складе 🎒';
+        statusStyle = 'background:#e0f2fe;color:#0369a1';
+      } else if (hasLocked) {
+        statusText = 'В пыли 🔒';
+        statusStyle = 'background:#fee2e2;color:#b91c1c';
+      }
+
       const stepsHtml = ch.items.slice(0, r.l + 1).map((stName, lvl) => {
         const isTarget = lvl === r.l;
-        const owned = S.board.some(c => c && c.t === 'item' && !c.lock && c.k === r.k && c.l === lvl);
+        const owned = !hasOnBoard && S.board.some((c, ci) => !reservedCells.has(ci) && c && c.t === 'item' && !c.lock && c.k === r.k && c.l === lvl);
         return `${lvl > 0 ? '<span style="color:#a89878;font-weight:900">→</span>' : ''}
           <div class="chain-step${isTarget ? ' target' : (owned ? ' owned' : '')}">
             <div style="width:26px;height:26px">${itemSVG(r.k, lvl)}</div>
@@ -1530,6 +1618,14 @@ function renderModal() {
             <span style="color:var(--muted)">Ур.${lvl + 1}</span>
           </div>`;
       }).join('');
+
+      const detailSection = hasOnBoard
+        ? `<div style="font-size:11px;font-weight:700;color:#15803d;background:#f0fdf4;padding:6px 8px;border-radius:10px">Предмет готов и зарезервирован на поле — промежуточные детали не требуются.</div>`
+        : `${bagIdx >= 0 ? '<div style="font-size:11px;font-weight:700;color:#0369a1;background:#f0f9ff;padding:6px 8px;border-radius:10px">Этот предмет лежит на складе 🎒 — перенеси его на поле, чтобы сдать заказ.</div>' : ''}
+           ${hasLocked ? '<div style="font-size:11px;font-weight:700;color:#b91c1c;background:#fef2f2;padding:6px 8px;border-radius:10px">Этот предмет заблокирован пылью 🔒 — объедини его с парой на поле.</div>' : ''}
+           <div style="font-size:11px;font-weight:800;color:var(--muted)">Как получить «${name}» (соединяй пары одинаковых):</div>
+           <div class="chain-row">${stepsHtml}</div>`;
+
       return `<div class="card-row" style="flex-direction:column;align-items:stretch;gap:6px">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
           <div style="display:flex;align-items:center;gap:10px">
@@ -1539,21 +1635,26 @@ function renderModal() {
               <div style="font-size:12px;color:var(--muted);margin-top:2px">${sourceMap[r.k] || ''}</div>
             </div>
           </div>
-          <span style="font-size:11px;font-weight:900;padding:4px 8px;border-radius:9px;background:${hasOnBoard ? '#dcfce7;color:#15803d' : '#fef3c7;color:#b45309'}">
-            ${hasOnBoard ? 'Есть на поле ✓' : 'Нужно собрать'}
+          <span style="font-size:11px;font-weight:900;padding:4px 8px;border-radius:9px;white-space:nowrap;${statusStyle}">
+            ${statusText}
           </span>
         </div>
-        <div style="font-size:11px;font-weight:800;color:var(--muted)">Цепочка слияния (соединяй пары одинаковых):</div>
-        <div class="chain-row">${stepsHtml}</div>
+        ${detailSection}
       </div>`;
     }).join('');
     body.innerHTML = `
       <div class="card-row" style="background:#f8fafc">
-        <div><b>Награда за выполнение заказа</b><div style="font-size:12px;color:var(--muted)">Собери все нужные предметы на поле</div></div>
+        <div>
+          <b>Награда за заказ • Собрано: ${readyCount}/${ord.reqs.length}</b>
+          <div style="font-size:12px;color:var(--muted)">Списываются только указанные ниже предметы</div>
+        </div>
         <div style="font-size:15px;font-weight:900;text-align:right">+${ord.coins} 🪙 &nbsp; +${ord.stars} ⭐</div>
       </div>
       ${buildPreviewHtml}
-      ${reqCards}`;
+      ${reqCards}
+      <button class="act-btn" id="modal-ord-go" style="width:100%;padding:11px;font-size:14px" ${complete ? '' : 'disabled'}>
+        ${complete ? `Сдать заказ (+${ord.coins}🪙 +${ord.stars}⭐)` : `Собрано ${readyCount} из ${ord.reqs.length} предметов`}
+      </button>`;
   } else if (curTab === 'audio') {
     title.textContent = '🎵 Музыка и настройки';
     body.innerHTML = `
@@ -1636,6 +1737,24 @@ $('#m-body').onclick = e => {
     syncAudio();
     renderModal();
     save();
+  }
+  if (e.target.id === 'modal-ord-go' && inspectOrder && S.orders[inspectOrder.oi]) {
+    const oi = inspectOrder.oi;
+    const ord = S.orders[oi];
+    const matches = checkOrderReady(ord);
+    if (!isOrderComplete(ord, matches)) return;
+    matches.forEach(idx => { S.board[idx] = null; });
+    S.coins += ord.coins;
+    S.stars += ord.stars;
+    selIdx = -1;
+    S.orders.splice(oi, 1);
+    if (S.tut === 3) advanceTut(3);
+    refillOrders();
+    sOrder(); note('success');
+    flt(`+${ord.coins}🪙 +${ord.stars}⭐`, 120, 220, '#16a34a');
+    openModal('board');
+    updateAll();
+    return;
   }
   if (e.target.id === 'rst-game') {
     localStorage.removeItem(SAVE_KEY);
@@ -1787,7 +1906,7 @@ store.get(SAVE_KEY).then(raw => {
       S.built = o.built || {};
       S.genLvl = Object.assign({ g_wood: 1, g_stone: 1, g_food: 1 }, o.genLvl);
       S.bag = o.bag || [];
-      S.orders = o.orders || [];
+      S.orders = (o.orders || []).filter(ord => ord && Array.isArray(ord.reqs) && ord.reqs.length > 0);
     }
   } catch (e) {}
   if (!S.board || S.board.length !== 30) initNewBoard();
