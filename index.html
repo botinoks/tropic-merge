@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Tropic Merge — Merge & Build</title>
-<script type="text/javascript" src="https://me.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=99fzRdT7qGAvFZ6RIgwyA5p_npleX3aeXBcyk7z4ekq-qP2SSt5rCwW0fCTIpvHVJaquZv0whVkUj5NmdLS1WEt3AMtHmAPoLBN1pYNPUkT3OcRizzd_faUIOj3X8urhxERZrReBx7hQqS3293ho6Z5G2o-HFkptjFVs8JwhjtaH_2vB7BtADJXUPbFvAl2QGWrPgmuEzEKMatfbVAhCir0xY4ZMnDJ7qrHmgpf0W_QaBTkV0H2L5h5Gc8n8RDb37EiCqL31TQKUrqewp3qfoxkKkh6gLJ7fWLwgsX9D-94RDHF6o7TEIHSyyfvn0hCQ" charset="UTF-8"></script><script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -70,9 +70,9 @@ body{
 #island-wrap{
   position:relative;
   margin:0 10px;
-  height:24dvh;
-  min-height:146px;
-  max-height:220px;
+  height:25dvh;
+  min-height:152px;
+  max-height:225px;
   border-radius:22px;
   overflow:hidden;
   background:radial-gradient(circle at 50% 35%,#79ece2 0%,#39c2bc 68%,#26a3a6 100%);
@@ -83,8 +83,8 @@ body{
 .stage-badge{
   position:absolute;
   top:6px;left:8px;
-  background:rgba(255,255,255,.88);
-  padding:2px 7px;
+  background:rgba(255,255,255,.9);
+  padding:2px 8px;
   border-radius:9px;
   font-size:10px;
   font-weight:800;
@@ -117,15 +117,17 @@ body{
 @keyframes sway{0%,100%{transform:rotate(-2.5deg)}50%{transform:rotate(2.5deg)}}
 @keyframes spinSlow{to{transform:rotate(360deg)}}
 @keyframes floatBoat{0%,100%{transform:translateY(0px)}50%{transform:translateY(-3px)}}
-@keyframes smokeRise{0%{transform:translate(0,0) scale(.6);opacity:.7}100%{transform:translate(6px,-18px) scale(1.4);opacity:0}}
-@keyframes gullFly{0%{transform:translateX(-30px) translateY(0)}50%{transform:translateX(180px) translateY(-8px)}100%{transform:translateX(410px) translateY(2px)}}
-@keyframes popBuild{0%{transform:scale(0) translateY(15px);opacity:0}70%{transform:scale(1.12) translateY(-3px);opacity:1}100%{transform:scale(1) translateY(0);opacity:1}}
+@keyframes smokeRise{0%{transform:translate(0,0) scale(.6);opacity:.75}100%{transform:translate(6px,-18px) scale(1.45);opacity:0}}
+@keyframes gullFly{0%{transform:translateX(-40px) translateY(0)}50%{transform:translateX(190px) translateY(-9px)}100%{transform:translateX(420px) translateY(2px)}}
+@keyframes popBuild{0%{transform:scale(0) translateY(15px);opacity:0}70%{transform:scale(1.14) translateY(-3px);opacity:1}100%{transform:scale(1) translateY(0);opacity:1}}
 .wave-ring{transform-origin:200px 115px;animation:wavePulse 3.6s ease-in-out infinite}
 .palm{transform-box:fill-box;transform-origin:bottom center;animation:sway 4s ease-in-out infinite}
 .mill-blades{transform-box:fill-box;transform-origin:center;animation:spinSlow 9s linear infinite}
 .boat-bob{animation:floatBoat 2.8s ease-in-out infinite}
 .smoke{animation:smokeRise 2.4s ease-out infinite}
 .gull{animation:gullFly 16s linear infinite}
+.gull-2{animation:gullFly 21s linear infinite;animation-delay:-7s}
+.gull-3{animation:gullFly 14s linear infinite;animation-delay:-11s}
 .bld-pop{transform-box:fill-box;transform-origin:bottom center;animation:popBuild .55s cubic-bezier(.22,1.25,.36,1) forwards}
 
 /* ===== ORDERS STRIP ===== */
@@ -134,40 +136,29 @@ body{
   gap:8px;
   padding:6px 10px 4px;
   overflow-x:auto;
+  overflow-y:hidden;
   flex:none;
   scrollbar-width:none;
+  touch-action:pan-x;
+  -webkit-overflow-scrolling:touch;
+  cursor:grab;
 }
+#orders:active{cursor:grabbing}
 #orders::-webkit-scrollbar{display:none}
+#orders *{touch-action:pan-x}
 .ord{
   background:var(--card);
   border-radius:16px;
-  padding:6px 10px;
+  padding:7px 11px;
   box-shadow:var(--shadow);
   display:flex;
   align-items:center;
-  gap:8px;
+  gap:9px;
   flex:none;
   border:2px solid transparent;
   transition:.15s;
 }
 .ord.ready{border-color:#4cd964;background:#f2fff4}
-.ord-items{display:flex;gap:4px}
-.ord-it{
-  position:relative;
-  width:38px;height:38px;
-  border-radius:10px;
-  background:#f4efe4;
-  display:grid;place-items:center;
-  cursor:pointer;
-  transition:transform .12s;
-}
-.ord-it:active{transform:scale(.92)}
-.ord-it::before{
-  content:'?';
-  position:absolute;top:1px;left:3px;
-  font-size:8px;font-weight:900;color:rgba(38,56,73,.42);
-}
-.ord-it.has::before{display:none}
 .chain-row{
   display:flex;align-items:center;gap:4px;overflow-x:auto;padding:4px 0;
 }
@@ -178,17 +169,10 @@ body{
 }
 .chain-step.target{background:#fef3c7;border-color:#ffb82e}
 .chain-step.owned{background:#dcfce7;border-color:#22c55e}
-.ord-it.has{background:#dcfce7;box-shadow:inset 0 0 0 2px #4cd964}
-.ord-it .chk{
-  position:absolute;bottom:-3px;right:-3px;
-  background:#22c55e;color:#fff;
-  width:14px;height:14px;border-radius:50%;
-  font-size:9px;font-weight:900;display:grid;place-items:center;
-}
 .ord-go{
   background:#22c55e;color:#fff;
   border:none;border-radius:11px;
-  padding:6px 10px;
+  padding:7px 12px;
   font-family:inherit;font-weight:900;font-size:12px;
   cursor:pointer;
   box-shadow:0 3px 0 #15803d;
@@ -197,13 +181,13 @@ body{
 .ord-more{
   background:#f1f5f9;color:var(--ink);
   border:1.5px solid #cbd5e1;border-radius:11px;
-  padding:6px 8px;
+  padding:7px 9px;
   font-family:inherit;font-weight:900;font-size:13px;letter-spacing:1px;line-height:1;
   cursor:pointer;
   box-shadow:0 2px 0 rgba(38,56,73,.12);
 }
 .ord-more:active{transform:translateY(2px);box-shadow:none}
-.ord-rew{font-size:11px;font-weight:800;color:var(--muted);line-height:1.15}
+.ord-rew{font-size:12px;font-weight:900;color:var(--ink);line-height:1.2}
 
 /* ===== MERGE BOARD (5x6) ===== */
 #board-area{
@@ -454,7 +438,6 @@ body{
 @keyframes tutGlow{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
 body.tut-active .tut-dim{opacity:.42;pointer-events:none !important}
 body.tut-active #orders.tut-dim .ord-more{pointer-events:auto !important;opacity:1 !important}
-
 </style>
 </head>
 <body>
@@ -543,7 +526,6 @@ body.tut-active #orders.tut-dim .ord-more{pointer-events:auto !important;opacity
 
 <div id="ghost"></div>
 <div id="fl"></div>
-<!-- Положи свой файл music.mp3 рядом с index.html, и он заиграет автоматически -->
 <audio id="bgm" src="music.mp3" loop preload="auto"></audio>
 
 <script>
@@ -598,7 +580,7 @@ const store = {
   }
 };
 
-/* ===== AUDIO (Custom music.mp3 + Cozy Procedural Kalimba Fallback) ===== */
+/* ===== AUDIO ===== */
 const bgm = $('#bgm');
 let bgmReady = true, customBlobUrl = null, AC = null, musicTimer = null, noteStep = 0;
 bgm.onerror = () => { bgmReady = false; };
@@ -657,7 +639,7 @@ function syncAudio() {
 }
 document.addEventListener('click', () => { if (!S.mute && bgm.paused) syncAudio(); }, { passive: true });
 
-/* ===== GAME DATA: CHAINS, ITEMS, BUILDINGS, STAGES ===== */
+/* ===== GAME DATA ===== */
 const CHAINS = {
   wood: {
     name: 'Дерево',
@@ -687,7 +669,6 @@ const GENS = {
   g_food: { name: 'Плодородная грядка', chain: 'food', sub: 'coin', subChance: 0.12 }
 };
 
-/* Vector SVG icons for every item & generator */
 function itemSVG(key, lvl) {
   const s = '<svg class="item-svg" viewBox="0 0 64 64">';
   if (key === 'g_wood') return s + '<ellipse cx="32" cy="52" rx="22" ry="7" fill="#58b959"/><circle cx="24" cy="30" r="14" fill="#43a047"/><circle cx="40" cy="32" r="12" fill="#66bb6a"/><circle cx="32" cy="21" r="13" fill="#81c784"/><rect x="29" y="38" width="6" height="14" rx="2" fill="#795548"/></svg>';
@@ -741,7 +722,6 @@ function itemSVG(key, lvl) {
     ];
     return s + (shapes[lvl] || shapes[0]) + '</svg>';
   }
-  // coin
   const shapes = [
     '<circle cx="32" cy="32" r="13" fill="#d97706" stroke="#92400e" stroke-width="2.5"/>',
     '<circle cx="32" cy="32" r="15" fill="#e2e8f0" stroke="#64748b" stroke-width="2.5"/><circle cx="32" cy="32" r="9" fill="none" stroke="#94a3b8" stroke-width="2"/>',
@@ -751,7 +731,7 @@ function itemSVG(key, lvl) {
   return s + (shapes[lvl] || shapes[0]) + '</svg>';
 }
 
-/* 5 Island Stages & 15 Buildings with coordinates on the SVG diorama */
+/* 5 Island Stages & 15 Buildings */
 const STAGES = [
   { name: 'Песчаная отмель', blds: ['fire', 'tent', 'bridge'] },
   { name: 'Бухта рыбака', blds: ['pier', 'hut', 'boat'] },
@@ -791,7 +771,7 @@ let S = {
   stage: 0,
   built: {},
   genLvl: { g_wood: 1, g_stone: 1, g_food: 1 },
-  board: [], // 30 cells: null | { t:'gen'|'item', k:string, l:number, lock?:bool }
+  board: [],
   bag: [],
   orders: [],
   seen: { wood: [1, 0, 0, 0, 0, 0, 0], stone: [0, 0, 0, 0, 0, 0, 0], food: [0, 0, 0, 0, 0, 0, 0], tool: [0, 0, 0, 0, 0, 0], coin: [0, 0, 0, 0] },
@@ -807,28 +787,26 @@ function maxEn() {
   return m;
 }
 
+/* 1 energy per 60 seconds (1 minute) */
+const EN_STEP_MS = 60000;
 function regenEnergy() {
   const cap = maxEn();
   const now = Date.now();
   if (S.en >= cap) { S.enTs = now; return; }
-  const stepMs = 30000; // 1 energy per 30 sec
-  const gained = Math.floor((now - S.enTs) / stepMs);
+  const gained = Math.floor((now - S.enTs) / EN_STEP_MS);
   if (gained > 0) {
     S.en = Math.min(cap, S.en + gained);
-    S.enTs += gained * stepMs;
+    S.enTs += gained * EN_STEP_MS;
     if (S.en >= cap) S.enTs = now;
   }
 }
 
 function initNewBoard() {
   const b = Array(30).fill(null);
-  // Starting generator
   b[14] = { t: 'gen', k: 'g_wood', l: 1 };
-  // Free starter items
   b[8] = { t: 'item', k: 'wood', l: 0 };
   b[13] = { t: 'item', k: 'wood', l: 0 };
   b[15] = { t: 'item', k: 'wood', l: 1 };
-  // Locked cobweb/sand cells with pre-placed items to unlock by merging!
   const locks = [
     [0, 'wood', 2], [1, 'wood', 1], [4, 'tool', 0], [5, 'coin', 0],
     [6, 'wood', 1], [11, 'tool', 1], [18, 'stone', 1], [23, 'coin', 1],
@@ -867,7 +845,7 @@ function refillOrders() {
   while (S.orders.length < 3) S.orders.push(makeOrder());
 }
 
-/* ===== ISLAND DIORAMA & WALKING FACELESS VILLAGERS ===== */
+/* ===== ISLAND DIORAMA & WALKING VILLAGERS ===== */
 const VILLAGERS = [
   { x: 170, y: 128, tx: 140, ty: 118, col: '#ff7043', spd: 0.28, wait: 0 },
   { x: 195, y: 122, tx: 220, ty: 130, col: '#42a5f5', spd: 0.24, wait: 40 }
@@ -892,6 +870,19 @@ function getWalkTargets() {
     if (S.built[b.id] && b.id !== 'boat') pts.push({ x: b.x, y: b.y + 8 });
   });
   return pts;
+}
+
+function palmSVG(x, y, scale, delay, flip) {
+  const dir = flip ? -1 : 1;
+  return `<g transform="translate(${x},${y}) scale(${dir * scale},${scale})">
+    <g class="palm" style="animation-delay:${delay}s">
+      <ellipse cx="0" cy="1" rx="7" ry="2.5" fill="rgba(46,125,50,.28)"/>
+      <path d="M0,0 Q-4,-18 1,-32" stroke="#795548" stroke-width="4.2" fill="none" stroke-linecap="round"/>
+      <circle cx="-1" cy="-30" r="2.2" fill="#5d4037"/>
+      <circle cx="3" cy="-29" r="2.2" fill="#6d4c41"/>
+      <path d="M1,-32 Q-13,-37 -17,-28 M1,-32 Q-5,-45 6,-44 M1,-32 Q14,-38 16,-28 M1,-32 Q-11,-27 -12,-20 M1,-32 Q11,-26 12,-19" stroke="#2e7d32" stroke-width="3.6" fill="none" stroke-linecap="round"/>
+    </g>
+  </g>`;
 }
 
 function renderIsland() {
@@ -919,39 +910,66 @@ function renderIsland() {
     <!-- Sandy Footpaths -->
     <path d="M128,116 Q168,132 202,122 T276,144 M150,86 Q192,102 242,88" fill="none" stroke="#f3dfb6" stroke-width="6" stroke-linecap="round"/>
 
-    <!-- Decorative Palms -->
-    <g class="palm"><path d="M108,126 Q104,108 109,94" stroke="#8d6e63" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M109,94 Q95,89 91,98 M109,94 Q103,81 114,82 M109,94 Q122,88 124,98" stroke="#2e7d32" stroke-width="3.5" fill="none" stroke-linecap="round"/></g>
-    <g class="palm" style="animation-delay:-1.5s"><path d="M294,112 Q298,96 292,84" stroke="#8d6e63" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M292,84 Q279,80 276,89 M292,84 Q291,72 301,74 M292,84 Q305,81 306,90" stroke="#388e3c" stroke-width="3.5" fill="none" stroke-linecap="round"/></g>
+    <!-- Beach & Nature Details: rocks, starfish, shells, flowering bushes -->
+    <ellipse cx="88" cy="140" rx="6" ry="3.5" fill="#90a4ae"/><ellipse cx="94" cy="142" rx="4" ry="2.5" fill="#b0bec5"/>
+    <ellipse cx="308" cy="134" rx="5.5" ry="3" fill="#90a4ae"/><circle cx="314" cy="136" r="2.5" fill="#cfd8dc"/>
+    <polygon points="138,158 140,154 142,158 146,159 142,161 143,165 140,162 137,165 138,161 134,159" fill="#ff7043"/>
+    <polygon points="246,161 247.5,158 249,161 252,162 249,163.5 250,166.5 247.5,164.5 245,166.5 246,163.5 243,162" fill="#ff8a65"/>
+    <circle cx="182" cy="161" r="2.2" fill="#fff59d"/><circle cx="292" cy="154" r="2" fill="#ffccbc"/>
+    <!-- Tropical Bushes with flowers -->
+    <g transform="translate(102,130)"><circle cx="0" cy="0" r="6" fill="#43a047"/><circle cx="6" cy="1" r="5" fill="#66bb6a"/><circle cx="-1" cy="-2" r="1.6" fill="#ff5252"/><circle cx="5" cy="0" r="1.5" fill="#ffd54f"/></g>
+    <g transform="translate(278,106)"><circle cx="0" cy="0" r="5.5" fill="#388e3c"/><circle cx="5" cy="1" r="4.5" fill="#66bb6a"/><circle cx="1" cy="-1.5" r="1.5" fill="#ff80ab"/><circle cx="5" cy="1" r="1.4" fill="#fff176"/></g>
+    <g transform="translate(142,72)"><circle cx="0" cy="0" r="5" fill="#43a047"/><circle cx="4" cy="1" r="4" fill="#81c784"/><circle cx="1" cy="-1" r="1.4" fill="#ff5252"/></g>
+
+    <!-- Lush Palm Groves -->
+    ${palmSVG(106, 128, 1.05, 0, false)}
+    ${palmSVG(96, 114, 0.82, -1.1, true)}
+    ${palmSVG(294, 114, 1.05, -1.6, true)}
+    ${palmSVG(303, 126, 0.80, -0.5, false)}
+    ${palmSVG(126, 76, 0.85, -2.2, false)}
+    ${palmSVG(262, 68, 0.88, -0.9, true)}
   `;
 
-  // Stage 1 Buildings
-  if (b.tent) svg += `<g class="${pop('tent')}" transform="translate(110,94)"><polygon points="15,2 0,24 30,24" fill="#ff8a65" stroke="#bf360c" stroke-width="1.5"/><polygon points="15,2 10,24 20,24" fill="#ffe0b2"/></g>`;
-  if (b.fire) svg += `<g class="${pop('fire')}" transform="translate(157,118)"><ellipse cx="8" cy="13" rx="9" ry="3.5" fill="#78909c"/><path d="M8,2 C13,7 12,12 8,12 C4,12 3,7 8,2 Z" fill="#ff7043"/><path d="M8,6 C10,9 10,12 8,12 C6,12 6,9 8,6 Z" fill="#ffd54f"/></g>`;
-  if (b.bridge) svg += `<g class="${pop('bridge')}" transform="translate(212,124)"><rect x="0" y="4" width="26" height="10" rx="2" fill="#a1887f" stroke="#5d4037" stroke-width="1.5"/><path d="M4,4v10M10,4v10M16,4v10M22,4v10" stroke="#5d4037" stroke-width="1.2"/></g>`;
+  // Stage 1 Buildings (enlarged & high contrast so every built structure is clearly visible)
+  if (b.tent) svg += `<g class="${pop('tent')}" transform="translate(106,86) scale(1.22)"><ellipse cx="15" cy="24" rx="16" ry="4" fill="rgba(0,0,0,.16)"/><polygon points="15,1 0,24 30,24" fill="#ff7043" stroke="#bf360c" stroke-width="1.8"/><polygon points="15,1 9,24 21,24" fill="#ffe0b2"/><line x1="15" y1="1" x2="15" y2="24" stroke="#5d4037" stroke-width="1.5"/></g>`;
+  if (b.fire) svg += `<g class="${pop('fire')}" transform="translate(154,113) scale(1.28)"><ellipse cx="9" cy="14" rx="10" ry="4" fill="#607d8b" stroke="#37474f" stroke-width="1"/><path d="M9,1 C15,7 14,13 9,13 C4,13 3,7 9,1 Z" fill="#ff5722"/><path d="M9,5 C12,9 11,13 9,13 C7,13 6,9 9,5 Z" fill="#ffd54f"/></g>`;
+  if (b.bridge) svg += `<g class="${pop('bridge')}" transform="translate(210,120) scale(1.25)"><rect x="0" y="3" width="28" height="12" rx="2.5" fill="#a1887f" stroke="#4e342e" stroke-width="1.8"/><path d="M5,3v12M11,3v12M17,3v12M23,3v12" stroke="#4e342e" stroke-width="1.5"/><line x1="0" y1="3" x2="28" y2="3" stroke="#d7ccc8" stroke-width="1.5"/></g>`;
 
   // Stage 2 Buildings
-  if (b.hut) svg += `<g class="${pop('hut')}" transform="translate(238,96)"><rect x="4" y="10" width="24" height="16" rx="2" fill="#ffe0b2" stroke="#8d6e63" stroke-width="1.5"/><polygon points="1,11 16,1 31,11" fill="#29b6f6"/><rect x="13" y="17" width="6" height="9" fill="#6d4c41"/></g>`;
-  if (b.pier) svg += `<g class="${pop('pier')}" transform="translate(268,140)"><rect x="0" y="3" width="34" height="9" rx="2" fill="#8d6e63"/><rect x="4" y="12" width="3" height="6" fill="#5d4037"/><rect x="26" y="12" width="3" height="6" fill="#5d4037"/></g>`;
-  if (b.boat) svg += `<g class="boat-bob${pop('boat')}" transform="translate(314,144)"><path d="M2,14 L26,14 L22,21 L6,21 Z" fill="#ef5350"/><polygon points="14,2 14,13 24,13" fill="#ffffff"/><line x1="14" y1="2" x2="14" y2="14" stroke="#5d4037" stroke-width="1.5"/></g>`;
+  if (b.hut) svg += `<g class="${pop('hut')}" transform="translate(235,88) scale(1.25)"><ellipse cx="16" cy="26" rx="15" ry="4" fill="rgba(0,0,0,.16)"/><rect x="4" y="10" width="24" height="16" rx="2" fill="#ffe0b2" stroke="#6d4c41" stroke-width="1.8"/><polygon points="0,11 16,0 32,11" fill="#039be5" stroke="#01579b" stroke-width="1.4"/><rect x="13" y="16" width="6" height="10" fill="#5d4037"/><rect x="7" y="14" width="4" height="4" fill="#fff9c4"/></g>`;
+  if (b.pier) svg += `<g class="${pop('pier')}" transform="translate(268,137) scale(1.25)"><rect x="0" y="3" width="36" height="10" rx="2" fill="#8d6e63" stroke="#4e342e" stroke-width="1.5"/><rect x="4" y="13" width="3.5" height="7" fill="#4e342e"/><rect x="17" y="13" width="3.5" height="7" fill="#4e342e"/><rect x="29" y="13" width="3.5" height="7" fill="#4e342e"/></g>`;
+  if (b.boat) svg += `<g class="boat-bob${pop('boat')}" transform="translate(310,138) scale(1.25)"><path d="M2,14 L28,14 L23,22 L7,22 Z" fill="#e53935" stroke="#b71c1c" stroke-width="1.4"/><polygon points="15,1 15,13 26,13" fill="#ffffff" stroke="#cfd8dc" stroke-width="1"/><line x1="15" y1="1" x2="15" y2="14" stroke="#4e342e" stroke-width="1.8"/></g>`;
 
   // Stage 3 Buildings
-  if (b.lighthouse) svg += `<g class="${pop('lighthouse')}" transform="translate(80,50)"><polygon points="8,38 11,10 17,10 20,38" fill="#ffffff" stroke="#cfd8dc" stroke-width="1.2"/><rect x="9" y="20" width="10" height="5" fill="#ef5350"/><rect x="10" y="6" width="8" height="5" fill="#ffd54f"/><polygon points="14,3 8,7 20,7" fill="#ef5350"/></g>`;
-  if (b.quarry_b) svg += `<g class="${pop('quarry_b')}" transform="translate(132,68)"><polygon points="2,18 10,4 22,6 28,18" fill="#90a4ae"/><rect x="8" y="11" width="10" height="7" fill="#455a64"/></g>`;
-  if (b.forge) svg += `<g class="${pop('forge')}" transform="translate(174,58)"><rect x="4" y="10" width="24" height="14" rx="2" fill="#78909c"/><polygon points="2,11 16,3 30,11" fill="#455a64"/><rect x="21" y="1" width="5" height="9" fill="#546e7a"/><circle class="smoke" cx="23" cy="0" r="3" fill="#eceff1"/></g>`;
+  if (b.lighthouse) svg += `<g class="${pop('lighthouse')}" transform="translate(75,40) scale(1.28)"><ellipse cx="14" cy="39" rx="11" ry="3.5" fill="rgba(0,0,0,.18)"/><polygon points="7,39 10,10 18,10 21,39" fill="#ffffff" stroke="#90a4ae" stroke-width="1.5"/><rect x="8.5" y="20" width="11" height="6" fill="#e53935"/><rect x="10" y="5" width="8" height="5" fill="#ffd54f"/><polygon points="14,1 7,6 21,6" fill="#e53935"/></g>`;
+  if (b.quarry_b) svg += `<g class="${pop('quarry_b')}" transform="translate(128,62) scale(1.25)"><polygon points="1,19 10,3 23,5 30,19" fill="#78909c" stroke="#455a64" stroke-width="1.5"/><rect x="9" y="11" width="11" height="8" rx="1" fill="#37474f"/><circle cx="24" cy="15" r="3" fill="#cfd8dc"/></g>`;
+  if (b.forge) svg += `<g class="${pop('forge')}" transform="translate(172,50) scale(1.25)"><rect x="3" y="10" width="26" height="15" rx="2" fill="#78909c" stroke="#37474f" stroke-width="1.5"/><polygon points="1,11 16,2 31,11" fill="#455a64"/><rect x="21" y="0" width="5.5" height="10" fill="#37474f"/><circle class="smoke" cx="24" cy="-1" r="3.5" fill="#ffffff"/></g>`;
 
   // Stage 4 Buildings
-  if (b.field) svg += `<g class="${pop('field')}" transform="translate(224,74)"><rect x="0" y="2" width="28" height="14" rx="3" fill="#fdd835" stroke="#f9a825" stroke-width="1.2"/><path d="M4,5h20M4,9h20M4,13h20" stroke="#f57f17" stroke-width="1.3"/></g>`;
-  if (b.mill) svg += `<g class="${pop('mill')}" transform="translate(272,56)"><polygon points="8,32 11,10 19,10 22,32" fill="#fff8e1" stroke="#bcaaa4" stroke-width="1.2"/><polygon points="15,4 9,11 21,11" fill="#ff7043"/><g class="mill-blades"><line x1="15" y1="2" x2="15" y2="24" stroke="#6d4c41" stroke-width="2"/><line x1="4" y1="13" x2="26" y2="13" stroke="#6d4c41" stroke-width="2"/></g></g>`;
-  if (b.bakery) svg += `<g class="${pop('bakery')}" transform="translate(198,86)"><rect x="3" y="9" width="24" height="14" rx="3" fill="#ffcc80" stroke="#e65100" stroke-width="1.2"/><path d="M2,10 Q15,0 28,10 Z" fill="#ef5350"/><circle cx="15" cy="16" r="4" fill="#5d4037"/></g>`;
+  if (b.field) svg += `<g class="${pop('field')}" transform="translate(222,70) scale(1.25)"><rect x="0" y="2" width="30" height="15" rx="3" fill="#fdd835" stroke="#e65100" stroke-width="1.5"/><path d="M4,6h22M4,10h22M4,14h22" stroke="#f57f17" stroke-width="1.6"/></g>`;
+  if (b.mill) svg += `<g class="${pop('mill')}" transform="translate(270,48) scale(1.25)"><polygon points="7,33 11,10 19,10 23,33" fill="#fff8e1" stroke="#8d6e63" stroke-width="1.5"/><polygon points="15,3 8,11 22,11" fill="#ff7043"/><g class="mill-blades"><line x1="15" y1="1" x2="15" y2="25" stroke="#5d4037" stroke-width="2.4"/><line x1="3" y1="13" x2="27" y2="13" stroke="#5d4037" stroke-width="2.4"/></g></g>`;
+  if (b.bakery) svg += `<g class="${pop('bakery')}" transform="translate(196,80) scale(1.25)"><rect x="3" y="9" width="25" height="15" rx="3" fill="#ffcc80" stroke="#bf360c" stroke-width="1.5"/><path d="M1,10 Q15,-1 29,10 Z" fill="#e53935"/><circle cx="15" cy="17" r="4.5" fill="#4e342e"/></g>`;
 
   // Stage 5 Buildings
-  if (b.workshop) svg += `<g class="${pop('workshop')}" transform="translate(148,86)"><rect x="3" y="9" width="24" height="14" rx="2" fill="#b3e5fc" stroke="#0288d1" stroke-width="1.2"/><polygon points="1,10 15,2 29,10" fill="#0288d1"/></g>`;
-  if (b.market) svg += `<g class="${pop('market')}" transform="translate(254,118)"><rect x="3" y="10" width="24" height="12" fill="#fff"/><path d="M1,10 L5,4 L25,4 L29,10 Z" fill="#ab47bc"/></g>`;
-  if (b.hall) svg += `<g class="${pop('hall')}" transform="translate(184,38)"><rect x="4" y="12" width="26" height="18" rx="2" fill="#fff" stroke="#ffb300" stroke-width="1.5"/><polygon points="1,13 17,2 33,13" fill="#ffb300"/><circle cx="17" cy="18" r="3.5" fill="#29b6f6"/></g>`;
+  if (b.workshop) svg += `<g class="${pop('workshop')}" transform="translate(145,80) scale(1.25)"><rect x="3" y="9" width="25" height="15" rx="2" fill="#b3e5fc" stroke="#01579b" stroke-width="1.5"/><polygon points="1,10 15,1 30,10" fill="#0288d1"/><circle cx="15" cy="16" r="3.5" fill="#ffd54f"/></g>`;
+  if (b.market) svg += `<g class="${pop('market')}" transform="translate(252,114) scale(1.25)"><rect x="3" y="10" width="25" height="13" fill="#fff" stroke="#6a1b9a" stroke-width="1.4"/><path d="M1,10 L5,3 L26,3 L30,10 Z" fill="#ab47bc"/><rect x="7" y="14" width="6" height="5" fill="#ffb300"/><rect x="17" y="14" width="6" height="5" fill="#ef5350"/></g>`;
+  if (b.hall) svg += `<g class="${pop('hall')}" transform="translate(182,30) scale(1.28)"><rect x="3" y="12" width="28" height="19" rx="2" fill="#fff" stroke="#ef6c00" stroke-width="1.8"/><polygon points="0,13 17,1 34,13" fill="#ffb300" stroke="#ef6c00" stroke-width="1.4"/><circle cx="17" cy="19" r="4" fill="#29b6f6"/><rect x="14" y="24" width="6" height="7" fill="#8d6e63"/></g>`;
 
-  // Villagers layer + Seagull
+  // Villagers layer + Flock of small birds
   svg += '<g id="villagers-layer"></g>';
-  svg += '<g class="gull" transform="translate(0,26)"><path d="M0,4 Q5,0 10,4 Q15,0 20,4" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/></g>';
+  svg += `
+    <g class="gull" transform="translate(0,26)">
+      <path d="M0,4 Q4,0 8,4 Q12,0 16,4" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+      <path d="M18,9 Q21,6 24,9 Q27,6 30,9" fill="none" stroke="#ffffff" stroke-width="1.7" stroke-linecap="round"/>
+    </g>
+    <g class="gull-2" transform="translate(0,40)">
+      <path d="M0,3 Q3.5,0 7,3 Q10.5,0 14,3" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M14,-4 Q17,-7 20,-4 Q23,-7 26,-4" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M25,2 Q28,-1 31,2 Q34,-1 37,2" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
+    </g>
+    <g class="gull-3" transform="translate(0,18)">
+      <path d="M0,3 Q3,0 6,3 Q9,0 12,3" fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round"/>
+    </g>`;
 
   $('#island-svg').innerHTML = svg;
   updateVillagersDOM();
@@ -991,7 +1009,7 @@ function stepVillagers() {
   requestAnimationFrame(stepVillagers);
 }
 
-/* ===== BOARD INTERACTION (TAP + DRAG & DROP) ===== */
+/* ===== BOARD INTERACTION ===== */
 let selIdx = -1;
 let dragIdx = -1;
 
@@ -1067,7 +1085,6 @@ function renderSelBar() {
   }
   txt.innerHTML = `<b>${name}</b> (${ch.name} • Ур. ${c.l + 1}/${ch.items.length})`;
 
-  // If treasure chest (coin tier 3), allow opening!
   if (c.k === 'coin' && c.l === 3) {
     const op = document.createElement('button');
     op.className = 'btn-use';
@@ -1084,7 +1101,6 @@ function renderSelBar() {
   }
 
   if (isTutActive()) return;
-  // Bag button
   if (S.bag.length < 4) {
     const bg = document.createElement('button');
     bg.className = 'btn-bag';
@@ -1093,7 +1109,6 @@ function renderSelBar() {
     acts.appendChild(bg);
   }
 
-  // Sell button
   const sellVal = Math.max(1, Math.pow(2, c.l));
   const sb = document.createElement('button');
   sb.className = 'btn-sell';
@@ -1167,11 +1182,9 @@ function triggerGen(idx) {
   const gLvl = S.genLvl[c.k] || 1;
   const isSub = Math.random() < g.subChance;
   const chainKey = isSub ? g.sub : g.chain;
-  // Balanced tier-2 drop chance: 0% at lvl 1, 12% at lvl 2, 24% at lvl 3
   const tier2Chance = (gLvl - 1) * 0.12;
   const lvl = (!isSub && Math.random() < tier2Chance) ? 1 : 0;
 
-  // Pick nearest empty cell to generator
   empty.sort((a, b) => {
     const da = Math.hypot((a % 6) - (idx % 6), Math.floor(a / 6) - Math.floor(idx / 6));
     const db = Math.hypot((b % 6) - (idx % 6), Math.floor(b / 6) - Math.floor(idx / 6));
@@ -1190,7 +1203,6 @@ function handleCellPair(from, to) {
   const A = S.board[from], B = S.board[to];
   if (!A || A.lock) return;
 
-  // Move to empty cell
   if (!B) {
     S.board[to] = A;
     S.board[from] = null;
@@ -1200,7 +1212,6 @@ function handleCellPair(from, to) {
     return;
   }
 
-  // Merge two matching items!
   if (A.t === 'item' && B.t === 'item' && A.k === B.k && A.l === B.l) {
     if (S.tut >= 0 && S.tut <= 3 && A.k === 'wood' && A.l >= 2) {
       const el = document.querySelector(`.cell[data-i="${to}"]`);
@@ -1227,7 +1238,6 @@ function handleCellPair(from, to) {
     const r = el ? el.getBoundingClientRect() : { left: 160, top: 300 };
     sMerge(nextL); hap('medium');
 
-    // Bonus coin drop on tier 3+ merge
     if (nextL >= 3 && Math.random() < 0.35) {
       const emp = S.board.findIndex(x => !x);
       if (emp >= 0) {
@@ -1246,7 +1256,6 @@ function handleCellPair(from, to) {
     return;
   }
 
-  // Swap two unlocked items/generators
   if (!B.lock) {
     S.board[to] = A;
     S.board[from] = B;
@@ -1301,7 +1310,6 @@ window.addEventListener('pointerup', e => {
       handleCellPair(dragIdx, +targetCell.dataset.i);
     }
   } else {
-    // Pure Tap
     const idx = ptrDownIdx;
     const c = S.board[idx];
     if (selIdx === idx) {
@@ -1322,7 +1330,7 @@ window.addEventListener('pointerup', e => {
   isDragging = false;
 });
 
-/* ===== ORDERS RENDER & FULFILL ===== */
+/* ===== ORDERS RENDER, TOUCH SWIPE & FULFILL ===== */
 function checkOrderReady(ord) {
   const used = new Set();
   return ord.reqs.map(r => {
@@ -1337,15 +1345,7 @@ function renderOrders() {
   wrap.innerHTML = S.orders.map((o, oi) => {
     const matches = checkOrderReady(o);
     const ready = matches.every(i => i >= 0);
-    const itemsHtml = o.reqs.map((r, ri) => {
-      const has = matches[ri] >= 0;
-      return `<div class="ord-it${has ? ' has' : ''}" data-oi="${oi}" data-ri="${ri}" title="${CHAINS[r.k].items[r.l]}">
-        <div style="width:30px;height:30px">${itemSVG(r.k, r.l)}</div>
-        ${has ? '<span class="chk">✓</span>' : ''}
-      </div>`;
-    }).join('');
     return `<div class="ord${ready ? ' ready' : ''}">
-      <div class="ord-items">${itemsHtml}</div>
       <div class="ord-rew">+${o.coins}🪙<br>+${o.stars}⭐</div>
       <button class="ord-go" data-oi="${oi}" ${ready ? '' : 'disabled'}>Сдать</button>
       <button class="ord-more" data-oi="${oi}" title="Условия заказа">•••</button>
@@ -1353,25 +1353,33 @@ function renderOrders() {
   }).join('');
 }
 
+/* Smooth touch & mouse horizontal drag-scroll for orders strip */
+const ordersEl = $('#orders');
+let ordDrag = false, ordDragged = false, ordStartX = 0, ordScrollLeft = 0;
+
+ordersEl.addEventListener('pointerdown', e => {
+  if (e.pointerType === 'touch') return; // native touch scroll handles touch
+  ordDrag = true;
+  ordDragged = false;
+  ordStartX = e.clientX;
+  ordScrollLeft = ordersEl.scrollLeft;
+});
+window.addEventListener('pointermove', e => {
+  if (!ordDrag) return;
+  const dx = e.clientX - ordStartX;
+  if (Math.abs(dx) > 5) ordDragged = true;
+  ordersEl.scrollLeft = ordScrollLeft - dx;
+});
+window.addEventListener('pointerup', () => { ordDrag = false; });
+
 let inspectOrder = null;
-$('#orders').onclick = e => {
+ordersEl.onclick = e => {
+  if (ordDragged) { ordDragged = false; return; }
   const moreBtn = e.target.closest('.ord-more');
   if (moreBtn) {
     const oi = +moreBtn.dataset.oi;
     if (S.orders[oi]) {
       inspectOrder = { oi, ri: 0 };
-      sfxTap(); hap('light');
-      openModal('order_info');
-    }
-    return;
-  }
-  const itBox = e.target.closest('.ord-it');
-  if (itBox) {
-    const oi = +itBox.dataset.oi;
-    const ri = +itBox.dataset.ri;
-    const ord = S.orders[oi];
-    if (ord) {
-      inspectOrder = { oi, ri };
       sfxTap(); hap('light');
       openModal('order_info');
     }
@@ -1399,7 +1407,7 @@ $('#orders').onclick = e => {
   updateAll();
 };
 
-/* ===== MODALS: BUILD, BAG, ATLAS, SETTINGS ===== */
+/* ===== MODALS: BUILD, BAG, ATLAS, SETTINGS, ORDER INFO ===== */
 let curTab = 'board';
 if (tg && tg.BackButton) {
   try { tg.BackButton.onClick(() => { if (curTab !== 'board') openModal('board'); }); } catch (e) {}
@@ -1421,7 +1429,6 @@ function renderModal() {
   if (curTab === 'build') {
     title.textContent = `🏗 Стройка острова (Этап ${S.stage + 1}/5)`;
     const stageBlds = BUILDINGS.filter(b => b.st <= S.stage);
-    // Generator upgrade cards (balanced: max lvl 3, expensive)
     const genKeys = ['g_wood', ...(S.built.quarry_b ? ['g_stone'] : []), ...(S.built.field ? ['g_food'] : [])];
     const genHtml = genKeys.map(gk => {
       const g = GENS[gk], lvl = S.genLvl[gk] || 1, mx = lvl >= 3;
@@ -1486,6 +1493,29 @@ function renderModal() {
       tool: 'Выпадает при добыче из <b>Лесной рощи</b> и <b>Карьера ⚡</b>',
       coin: 'Выпадает с <b>Грядки</b> и при слиянии предметов 3+ ур.'
     };
+
+    const futCoins = S.coins + ord.coins;
+    const futStars = S.stars + ord.stars;
+    const unbuiltStage = BUILDINGS.filter(b => b.st <= S.stage && !S.built[b.id]);
+    const canBuildList = unbuiltStage.filter(b => futCoins >= b.coins && futStars >= b.stars);
+    let buildPreviewHtml = '';
+    if (canBuildList.length > 0) {
+      const listStr = canBuildList.map(b => `<b>🔨 ${b.name}</b> <span style="color:var(--muted)">(${b.coins}🪙, ${b.stars}⭐)</span>`).join('<br>');
+      buildPreviewHtml = `<div class="card-row" style="background:#f2fff4;border-color:#86efac;flex-direction:column;align-items:flex-start;gap:4px">
+        <div style="font-size:12px;font-weight:900;color:#15803d">🏗 После сдачи можно будет построить:</div>
+        <div style="font-size:12px;line-height:1.4">${listStr}</div>
+      </div>`;
+    } else if (unbuiltStage.length > 0) {
+      const nextB = unbuiltStage[0];
+      const needC = Math.max(0, nextB.coins - futCoins);
+      const needS = Math.max(0, nextB.stars - futStars);
+      const lack = [needC ? `${needC}🪙` : '', needS ? `${needS}⭐` : ''].filter(Boolean).join(' и ');
+      buildPreviewHtml = `<div class="card-row" style="background:#fffbeb;border-color:#fde68a;flex-direction:column;align-items:flex-start;gap:3px">
+        <div style="font-size:12px;font-weight:900;color:#b45309">🏗 Ближайшая постройка: ${nextB.name}</div>
+        <div style="font-size:12px;color:var(--muted)">После сдачи заказа останется накопить: <b>${lack}</b></div>
+      </div>`;
+    }
+
     const reqCards = ord.reqs.map((r, ri) => {
       const ch = CHAINS[r.k];
       const name = ch.items[r.l];
@@ -1522,6 +1552,7 @@ function renderModal() {
         <div><b>Награда за выполнение заказа</b><div style="font-size:12px;color:var(--muted)">Собери все нужные предметы на поле</div></div>
         <div style="font-size:15px;font-weight:900;text-align:right">+${ord.coins} 🪙 &nbsp; +${ord.stars} ⭐</div>
       </div>
+      ${buildPreviewHtml}
       ${reqCards}`;
   } else if (curTab === 'audio') {
     title.textContent = '🎵 Музыка и настройки';
@@ -1535,10 +1566,6 @@ function renderModal() {
         <label class="act-btn" style="cursor:pointer">Выбрать файл<input type="file" id="pick-mp3" accept="audio/*" style="display:none"></label>
       </div>
       <div class="card-row">
-        <div><b>Обучение</b><div style="font-size:12px;color:var(--muted)">Пройти подсказки островитянина заново</div></div>
-        <button class="act-btn" style="background:#0288d1;box-shadow:0 3px 0 #0369a1" id="rpl-tut">Повторить</button>
-      </div>
-      <div class="card-row">
         <div><b>Сброс прогресса</b><div style="font-size:12px;color:var(--muted)">Начать остров заново</div></div>
         <button class="act-btn" style="background:#ef4444;box-shadow:0 3px 0 #991b1b" id="rst-game">Сбросить</button>
       </div>`;
@@ -1546,7 +1573,6 @@ function renderModal() {
 }
 
 $('#m-body').onclick = e => {
-  // Build building
   const bBtn = e.target.closest('[data-bld]');
   if (bBtn) {
     const b = BUILDINGS.find(x => x.id === bBtn.dataset.bld);
@@ -1557,14 +1583,12 @@ $('#m-body').onclick = e => {
     S.lastPop = b.id;
     if (S.tut === 4) advanceTut(4);
 
-    // Grant new generator onto board if applicable
     if (b.grantGen) {
       const emp = S.board.findIndex(x => !x);
       if (emp >= 0) S.board[emp] = { t: 'gen', k: b.grantGen, l: 1 };
       else S.bag.push({ t: 'gen', k: b.grantGen, l: 1 });
     }
 
-    // Check stage completion
     const stBlds = STAGES[S.stage].blds;
     if (stBlds.every(id => S.built[id]) && S.stage < STAGES.length - 1) {
       S.stage++;
@@ -1579,7 +1603,6 @@ $('#m-body').onclick = e => {
     return;
   }
 
-  // Upgrade generator
   const gBtn = e.target.closest('[data-upgen]');
   if (gBtn) {
     const gk = gBtn.dataset.upgen;
@@ -1595,7 +1618,6 @@ $('#m-body').onclick = e => {
     return;
   }
 
-  // Take from bag
   const bagSlot = e.target.closest('[data-bi]');
   if (bagSlot) {
     const bi = +bagSlot.dataset.bi;
@@ -1615,7 +1637,6 @@ $('#m-body').onclick = e => {
     renderModal();
     save();
   }
-  if (e.target.id === 'rpl-tut') { S.tut = 0; openModal('board'); updateAll(); return; }
   if (e.target.id === 'rst-game') {
     localStorage.removeItem(SAVE_KEY);
     location.reload();
@@ -1644,8 +1665,7 @@ $('#nav').addEventListener('click', e => {
   if (btn) openModal(btn.dataset.tab);
 });
 
-
-/* ===== INTERACTIVE VILLAGER TUTORIAL (5 STEPS, NO REWARD) ===== */
+/* ===== INTERACTIVE VILLAGER TUTORIAL ===== */
 const TUT_STEPS = [
   { tag: 'Шаг 1/5 • Добыча', msg: 'Нажми на <b>Лесную рощу ⚡</b> в центре поля, чтобы добыть ресурс!' },
   { tag: 'Шаг 2/5 • Слияние', msg: 'Перетащи <b>Ветку</b> на другую такую же <b>Ветку</b>, чтобы получить Бревно.' },
@@ -1674,7 +1694,6 @@ function renderTutorial() {
   document.body.classList.toggle('tut-active', active);
   box.classList.toggle('on', active);
 
-  // Clear previous highlights & dims
   document.querySelectorAll('.tut-pulse').forEach(el => el.classList.remove('tut-pulse'));
   document.querySelectorAll('.tut-dim').forEach(el => el.classList.remove('tut-dim'));
 
@@ -1684,13 +1703,11 @@ function renderTutorial() {
   $('#tut-step').textContent = st.tag;
   $('#tut-msg').innerHTML = st.msg;
 
-  // Block unrelated top/bottom controls during tutorial
   $('#btn-mute').classList.add('tut-dim');
   if (S.tut < 4) {
     $('#btn-build').classList.add('tut-dim');
     $('#nav').classList.add('tut-dim');
   } else {
-    // Step 5: highlight Строить button & Стройка tab
     $('#btn-build').classList.add('tut-pulse');
     document.querySelectorAll('.nav-btn').forEach(b => {
       if (b.dataset.tab === 'build') b.classList.add('tut-pulse');
@@ -1705,7 +1722,6 @@ function renderTutorial() {
     if (firstGo) firstGo.classList.add('tut-pulse');
   }
 
-  // Highlight relevant board cells
   if (S.tut === 0) {
     const gi = S.board.findIndex(c => c && c.t === 'gen');
     const gEl = gi >= 0 && document.querySelector(`.cell[data-i="${gi}"]`);
@@ -1735,7 +1751,7 @@ function updateHud() {
   if (S.en >= cap) {
     $('#h-ent').textContent = 'Максимум';
   } else {
-    const left = Math.max(1, Math.ceil((30000 - ((Date.now() - S.enTs) % 30000)) / 1000));
+    const left = Math.max(1, Math.ceil((EN_STEP_MS - ((Date.now() - S.enTs) % EN_STEP_MS)) / 1000));
     $('#h-ent').textContent = `+1 через ${left}с`;
   }
   $('#h-coin').textContent = S.coins;
@@ -1744,7 +1760,6 @@ function updateHud() {
   $('#stage-lbl').textContent = `🏝 ${STAGES[S.stage].name}`;
   $('#bdg-bag').textContent = `${S.bag.length}/4`;
 
-  // Check if any building is ready to construct
   const readyBlds = BUILDINGS.filter(b => b.st <= S.stage && !S.built[b.id] && S.stars >= b.stars && S.coins >= b.coins).length;
   $('#bdg-build').style.display = readyBlds ? 'inline-block' : 'none';
   $('#bdg-build').textContent = readyBlds;
